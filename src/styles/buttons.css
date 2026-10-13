@@ -1,0 +1,208 @@
+/*
+  ZUZU Button System
+  ------------------
+  One shared pill language for every CTA/action across the site,
+  modeled on the "Why ZUZU" reference pill: dark glass surface, thin
+  luminous brand-blue border, soft outer glow, no arrow. Structural
+  rules below (.btn, .btn-sm/md/lg) are variant-agnostic; each variant
+  (.btn-primary/secondary/outline/ghost) only sets color/border/glow,
+  so every button shares the same shape, motion and states. Colors
+  come from the --btn-* tokens in tokens.css (light-mode defaults
+  there, dark-mode overrides in its two [data-theme] blocks) so this
+  file never hardcodes a color itself.
+*/
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  border-radius: var(--btn-radius);
+  border: 1px solid transparent;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  user-select: none;
+  transition: transform var(--btn-transition), box-shadow var(--btn-transition),
+    border-color var(--btn-transition), background-color var(--btn-transition),
+    color var(--btn-transition), filter var(--btn-transition);
+}
+
+.btn-sm {
+  height: var(--btn-h-sm);
+  padding-inline: var(--btn-px-sm);
+  font-size: var(--btn-font-sm);
+}
+
+.btn-md {
+  height: var(--btn-h-md);
+  padding-inline: var(--btn-px-md);
+  font-size: var(--btn-font-md);
+}
+
+.btn-lg {
+  height: var(--btn-h-lg);
+  padding-inline: var(--btn-px-lg);
+  font-size: var(--btn-font-lg);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-green-400);
+  outline-offset: 3px;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.5;
+  filter: saturate(0.7);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* One-shot hover light sweep -- a single pass while the pointer is
+   actually over the button, distinct from the separate, always-on
+   .btn-landing-shimmer loop (still used standalone on landing-page
+   CTAs; the two compose fine since this uses ::after and shimmer uses
+   its own ::before). */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  transform: skewX(-20deg) translateX(0%);
+  opacity: 0;
+  transition: transform 650ms ease, opacity 650ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn:hover::after {
+  transform: skewX(-20deg) translateX(340%);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover,
+  .btn:active {
+    transform: none !important;
+  }
+
+  .btn::after {
+    display: none !important;
+  }
+}
+
+/* ---- Primary: the reference pill -- luminous brand-blue border, soft
+   glow, glass surface. ---- */
+.btn-primary {
+  color: var(--btn-primary-text);
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
+  box-shadow: var(--btn-primary-shadow);
+}
+
+.btn-primary:hover {
+  border-color: var(--btn-primary-border-hover);
+  box-shadow: var(--btn-primary-shadow-hover);
+}
+
+/* ---- Secondary: filled neutral surface, same brand-blue border
+   language -- for supporting actions that still need real visual
+   weight (nav "Log In", modal SSO buttons). ---- */
+.btn-secondary {
+  color: var(--color-ink);
+  background: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  box-shadow: var(--btn-secondary-shadow);
+}
+
+.btn-secondary:hover {
+  background: var(--btn-secondary-bg-hover);
+  border-color: var(--btn-secondary-border-hover);
+}
+
+/* ---- Outline: transparent, brand-blue border only -- the "quiet" CTA. ---- */
+.btn-outline {
+  color: var(--color-ink);
+  background: transparent;
+  border-color: var(--btn-outline-border);
+}
+
+.btn-outline:hover {
+  background: var(--btn-outline-bg-hover);
+  border-color: var(--btn-outline-border-hover);
+  box-shadow: var(--btn-outline-shadow-hover);
+}
+
+/* ---- Ghost: the lowest-emphasis action. Text-led, but with a hairline pill
+   so it still reads as a button and not as stray caption text. ---- */
+.btn-ghost {
+  color: var(--color-muted);
+  background: transparent;
+  border-color: var(--color-line);
+}
+
+.btn-ghost:hover {
+  color: var(--color-ink);
+  background: var(--color-elevated);
+  border-color: var(--btn-secondary-border-hover);
+}
+
+/* ---- Eyebrow badge: the small label pill above section headings
+   ("Why ZUZU", "How it works", ...) -- same glass surface + luminous
+   brand-blue border + soft glow as the button system above, scaled down
+   for a static label (no hover/press state). ---- */
+.eyebrow-badge {
+  border: 1px solid var(--eyebrow-border);
+  background: var(--eyebrow-bg);
+  color: var(--color-green);
+  box-shadow: var(--eyebrow-glow);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Hero-locked variants: InternalPageHero's section background is
+   always dark navy regardless of the site's light/dark theme (see its
+   own comment -- "Fixed to the section's own dark navy ... so it stays
+   consistent regardless of site theme"). The eyebrow badge and outline
+   button rendered inside it, though, pull the global eyebrow and
+   btn-outline tokens -- in light mode those resolve to values tuned
+   for a white page (a near-white glass badge, near-black button text),
+   which reads as washed-out against the permanently-dark hero. These
+   two classes pin the same values the dark theme already uses, so the
+   hero looks identical (and correct) in both light and dark mode. ---- */
+.eyebrow-badge--hero {
+  border: 1px solid rgba(141, 182, 255, 0.4) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 60%), rgba(42, 110, 235, 0.16) !important;
+  box-shadow: 0 0 0 1px rgba(89, 148, 255, 0.25), 0 2px 8px rgba(2, 6, 18, 0.35) !important;
+}
+
+.btn-outline--hero {
+  color: #ffffff !important;
+  border-color: rgba(141, 182, 255, 0.35) !important;
+}
+
+.btn-outline--hero:hover {
+  background: rgba(89, 148, 255, 0.1) !important;
+  border-color: rgba(141, 182, 255, 0.6) !important;
+  box-shadow: 0 0 0 1px rgba(89, 148, 255, 0.3) !important;
+}

@@ -1,0 +1,120 @@
+/* ==========================================================================
+   WhyZuzuSection 3D scene (components/ui/WhyZuzuSection.jsx)
+
+   The six-card "Track / Monitor / Understand / ..." grid as a small
+   product-showcase scene, following the same ownership pattern as the
+   rest of the site's 3D work (hero-3d.css, flow-steps-3d.css): each card
+   rises into place with a tilt-back-to-flat entrance as the grid scrolls
+   into view, then tilts live toward the cursor on hover (same delegated
+   pointer listener as the card-glass spotlight -- see
+   hooks/useCardSpotlight.js), against a soft ambient glow behind the
+   grid for depth.
+
+   The tilt/entrance transform lives on `.reason-3d-card`, a wrapper
+   AROUND the existing `.card-glass` element rather than on it, so this
+   never fights card-glass's own hover lift/shadow/spotlight for the same
+   `transform` property -- two nested elements, two independently-owned
+   transforms.
+   ========================================================================== */
+
+.reason-3d-scene {
+  perspective: 1600px;
+}
+
+/* Soft ambient glow behind the grid -- the same restrained depth cue
+   used behind the hero's 3D platform, scaled down and toned per theme
+   rather than the hero's stronger treatment. */
+.reason-3d-glow {
+  position: absolute;
+  inset: -10% -6% -10% -6%;
+  background: radial-gradient(60% 65% at 50% 35%, rgba(var(--color-green-rgb), 0.14), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+:root[data-theme='light'] .reason-3d-glow {
+  background: radial-gradient(60% 65% at 50% 35%, rgba(var(--color-green-rgb), 0.08), transparent 70%);
+}
+
+/* Rotate only -- no hover scale. A scaled-up card visually grows past
+   its own grid cell and overlaps/overhangs its neighbours, breaking the
+   row's clean rectangle (that combined with card-glass's own hover lift
+   underneath is what made a hovered card look mis-sized against the
+   other five). Tilt alone gives the "responds to you" read without
+   disturbing the grid. */
+.reason-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 320ms var(--ease-emphasized);
+}
+
+/* Hidden, tilted-back-and-away resting state before the grid is in view --
+   pairs with the entrance keyframe below the same way every other
+   ProductReveal role does (see product-motion.css). */
+.pr:not(.is-in) .reason-3d-card {
+  opacity: 0;
+  transform: perspective(1000px) rotateX(-14deg) translateY(24px) translateZ(-60px);
+}
+
+@keyframes reason-3d-in {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-14deg) translateY(24px) translateZ(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) translateY(0) translateZ(0);
+  }
+}
+
+/* `backwards` (not `both`): once the entrance finishes, its grip on
+   `transform` releases and the plain rules above -- the live cursor
+   tilt/hover -- take over through the ordinary cascade. */
+.pr.is-in .reason-3d-card {
+  animation: reason-3d-in 760ms var(--ease-emphasized) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+/* Icon "lift": same depth cue as FlowSteps' icon chip -- scale + a
+   brighter accent glow on hover, read through the card's own `group`. */
+.reason-3d-icon {
+  transition: transform 220ms var(--ease-emphasized), box-shadow 220ms var(--ease-emphasized),
+    border-color 220ms var(--ease-emphasized);
+}
+
+.group:hover .reason-3d-icon {
+  transform: scale(1.14);
+  border-color: rgba(var(--color-green-rgb), 0.5);
+  box-shadow: 0 6px 18px -4px rgba(var(--color-green-rgb), 0.45);
+}
+
+/* Mobile/tablet: keep the fade + rise entrance, drop the finer depth
+   cues (perspective, glow) -- matching the "reduce 3D movement
+   substantially on mobile" approach already used in hero-3d.css. Hover
+   tilt itself never applies here (useCardSpotlight skips coarse/touch
+   pointers). */
+@media (max-width: 1023.98px) {
+  .reason-3d-glow {
+    display: none;
+  }
+
+  .pr:not(.is-in) .reason-3d-card {
+    transform: translateY(14px);
+  }
+
+  @keyframes reason-3d-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reason-3d-card {
+    transition: none;
+  }
+}

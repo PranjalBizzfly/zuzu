@@ -1,0 +1,275 @@
+/*
+  UseZuzu Design Tokens
+  ---------------------
+  Single source of truth for the visual language, built on the official
+  UseZuzu Brand Guidelines (2026):
+
+    Brand blue   #416AB4   (primary)
+    Bright blue  #5994FF   (approved accent / gradient stop)
+    Vivid blue   #2A6EEB   (approved accent / gradient stop)
+    Black        #000000   (logo on light surfaces)
+    Typeface     Helvetica Now Text
+
+  Two complete themes share the same token names, so every existing
+  Tailwind utility built on them (bg-page, bg-elevated, text-ink,
+  border-line, text-green, ...) is theme-aware with no component changes:
+
+    LIGHT  -> BLACK UseZuzu logo. Cool off-white page, white cards, near-
+              black text, #416AB4 as the accent (5.4:1 on white).
+    DARK   -> BLUE UseZuzu logo. Deep midnight-navy page with stepped,
+              slightly lighter surfaces, near-white text, #5994FF as the
+              accent (6.4:1 on the page). Surfaces are deliberately kept
+              dark enough that the #416AB4 logo holds >= 3:1 contrast on
+              the navbar and footer (3.5:1 on --color-page).
+
+  Which logo renders is decided in ONE place: components/ui/Logo.jsx.
+
+  Token naming notes (kept stable so existing call sites don't move):
+  - --color-green is the site's single primary accent. The name predates
+    the brand palette; it now resolves to brand blue. It is theme-aware:
+    #416AB4 on light surfaces, #5994FF on dark ones. -600 is the darker
+    step, -400 the lighter step, -rgb the same value as an r,g,b triplet
+    for translucent rgba() glows.
+  - --color-blue / --color-purple are the two Badge tag colours. Both are
+    brand blues (purple is an alias of the accent) -- no off-palette hue.
+  - The Tailwind "indigo" / "violet" / "purple" scales are remapped below
+    to the same brand tokens, so the ~50 places that reach for those
+    utilities directly (GetInTouchSection, HomeWorkdayHero, ...) pick up
+    the brand palette without being edited one by one.
+  - Named --color-page, not --color-base: Tailwind v4 auto-generates a
+    `text-base`/`bg-base` utility from any `--color-base` theme token,
+    which would silently collide with its built-in `text-base` font size.
+*/
+
+@theme {
+  /* ---- Color: surfaces (LIGHT default) ---- */
+  --color-page: #f4f7fc;
+  --color-surface: #ffffff;
+  --color-elevated: #ffffff;
+  --color-overlay: #e9eff9;
+  --color-navbar: #ffffff;
+  /* Alternating page-section band: a step deeper than --color-page so
+     white cards keep their pop on both tones (see base.css "Section bands"). */
+  --color-band: #ebf0f9;
+
+  /* ---- Color: borders ---- */
+  --color-line: rgba(14, 30, 66, 0.09);
+  --color-line-strong: rgba(14, 30, 66, 0.18);
+
+  /* ---- Color: text ---- */
+  --color-ink: #0a1020;
+  --color-muted: #46526f;
+  --color-faint: #5f6b86;
+
+  /* ---- Color: brand accent (theme-aware; see header) ---- */
+  --color-green: #416ab4;
+  --color-green-600: #2e5497;
+  --color-green-400: #5994ff;
+  --color-green-rgb: 65, 106, 180;
+
+  /* ---- Color: brand blues, fixed (do not change with theme) ---- */
+  --color-brand: #416ab4;
+  --color-brand-bright: #5994ff;
+  --color-brand-vivid: #2a6eeb;
+
+  /* ---- Color: Badge tag colours (both brand blues) ---- */
+  --color-blue: #2a6eeb;
+  --color-blue-600: #1f57c2;
+  --color-blue-400: #2a6eeb;
+  --color-purple: var(--color-green);
+  --color-purple-600: var(--color-green-600);
+  --color-purple-400: var(--color-green);
+
+  /* ---- Tailwind indigo/violet/purple -> brand accent (see header) ---- */
+  --color-indigo-300: var(--color-green-400);
+  --color-indigo-400: var(--color-green);
+  --color-indigo-500: var(--color-green);
+  --color-indigo-600: var(--color-green-600);
+  --color-violet-300: var(--color-green-400);
+  --color-violet-400: var(--color-green);
+  --color-violet-500: var(--color-green);
+  --color-violet-600: var(--color-green-600);
+  --color-purple-300: var(--color-green-400);
+  --color-purple-500: var(--color-green);
+
+  /* ---- Color: semantic (muted, enterprise-dashboard tones) ---- */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* ---- Typography ----
+     Brand typeface is Helvetica Now Text (licensed; not bundled). The
+     stack lists it first so it is used wherever installed, then falls
+     back through the closest metric-compatible faces. Drop licensed
+     @font-face files in and this stack needs no change. */
+  --font-sans: 'Helvetica Now Text', 'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, ui-sans-serif,
+    system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* ---- Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows (light: soft, low-opacity, blue-navy tinted) ---- */
+  --shadow-xs: 0 1px 2px rgba(14, 30, 66, 0.05);
+  --shadow-sm: 0 2px 8px rgba(14, 30, 66, 0.07);
+  --shadow-md: 0 8px 24px rgba(14, 30, 66, 0.09);
+  --shadow-lg: 0 16px 48px rgba(14, 30, 66, 0.12);
+  /* Restrained accent shadows: a crisp 1px border ring plus a tight,
+     mostly-neutral elevation shadow -- not a wide color halo. */
+  --shadow-glow-green: 0 0 0 1px rgba(var(--color-green-rgb), 0.3), 0 4px 16px rgba(14, 30, 66, 0.08);
+  --shadow-glow-blue: 0 0 0 1px rgba(42, 110, 235, 0.28), 0 4px 16px rgba(14, 30, 66, 0.08);
+  --shadow-glow-purple: 0 0 0 1px rgba(var(--color-green-rgb), 0.28), 0 4px 16px rgba(14, 30, 66, 0.08);
+}
+
+/* ---- DARK theme: deep midnight-navy, stepped surfaces ----
+   page (#0a1122) -> surface (#0d1730) -> elevated (#141f3a) ->
+   overlay (#1d2b4d). --color-surface doubles as the "section" tone at
+   partial opacity (bg-surface/40-60) so alternating page sections read
+   as a visible navy tint against the base. Set by the [data-theme]
+   attribute (ThemeToggle + the no-flash script in index.html, which
+   always runs before first paint).
+
+   .surface-dark applies the very same tokens to any single element, so a
+   deliberately dark "island" (the closing CTA panel) keeps correct text,
+   border and button colours while the rest of the page is light. It must be
+   paired with data-theme="dark" on the element so Tailwind's dark: variant
+   matches inside it too. ---- */
+:root[data-theme='dark'],
+.surface-dark {
+  --color-page: #0a1122;
+  --color-navbar: #0a1122;
+  --color-band: #0d1730;
+  --color-surface: #0d1730;
+  --color-elevated: #141f3a;
+  --color-overlay: #1d2b4d;
+
+  --color-line: rgba(140, 170, 235, 0.14);
+  --color-line-strong: rgba(140, 170, 235, 0.26);
+
+  --color-ink: #f3f6fc;
+  --color-muted: #a3b0cc;
+  --color-faint: #7583a3;
+
+  --color-green: #5994ff;
+  --color-green-600: #2a6eeb;
+  --color-green-400: #8db6ff;
+  --color-green-rgb: 89, 148, 255;
+
+  --color-blue-400: #5994ff;
+
+  --shadow-xs: 0 1px 2px rgba(2, 6, 18, 0.5);
+  --shadow-sm: 0 2px 8px rgba(2, 6, 18, 0.45);
+  --shadow-md: 0 8px 24px rgba(2, 6, 18, 0.5);
+  --shadow-lg: 0 16px 48px rgba(2, 6, 18, 0.6);
+
+  /* ---- Buttons ---- */
+  --btn-primary-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(135deg, #2a6eeb 0%, #416ab4 100%);
+  --btn-primary-border: rgba(141, 182, 255, 0.45);
+  --btn-primary-border-hover: rgba(180, 208, 255, 0.65);
+  --btn-primary-shadow: 0 0 0 1px rgba(89, 148, 255, 0.3), 0 4px 16px rgba(2, 6, 18, 0.5);
+  --btn-primary-shadow-hover: 0 0 0 1px rgba(141, 182, 255, 0.5), 0 6px 20px rgba(2, 6, 18, 0.55);
+
+  --btn-secondary-bg: rgba(89, 148, 255, 0.1);
+  --btn-secondary-bg-hover: rgba(89, 148, 255, 0.18);
+  --btn-secondary-border: rgba(89, 148, 255, 0.3);
+  --btn-secondary-border-hover: rgba(141, 182, 255, 0.55);
+  --btn-secondary-shadow: 0 2px 10px rgba(2, 6, 18, 0.4);
+
+  --btn-outline-border: rgba(141, 182, 255, 0.35);
+  --btn-outline-border-hover: rgba(141, 182, 255, 0.6);
+  --btn-outline-bg-hover: rgba(89, 148, 255, 0.1);
+  --btn-outline-shadow-hover: 0 0 0 1px rgba(89, 148, 255, 0.3);
+
+  --eyebrow-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 60%), rgba(42, 110, 235, 0.16);
+  --eyebrow-border: rgba(141, 182, 255, 0.4);
+  --eyebrow-glow: 0 0 0 1px rgba(89, 148, 255, 0.25), 0 2px 8px rgba(2, 6, 18, 0.35);
+
+  color-scheme: dark;
+}
+
+:root {
+  color-scheme: light;
+
+  /* ---- Brand gradient: accent -> vivid blue (theme-aware through the
+     accent token). Used for headline accents and small rule marks. ---- */
+  --gradient-brand: linear-gradient(135deg, var(--color-green) 0%, var(--color-brand-vivid) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgba(var(--color-green-rgb), 0.14) 0%, rgba(42, 110, 235, 0.14) 100%);
+
+  /* ---- Buttons: one shared pill language for every CTA/action
+     site-wide (see src/styles/buttons.css and Button.jsx). Structural
+     tokens (radius/height/padding/transition) are identical in both
+     themes; the per-variant bg/border/glow tokens below are the LIGHT
+     defaults, and [data-theme="dark"] above overrides them. ---- */
+  --btn-radius: var(--radius-full);
+  --btn-h-sm: 2.25rem;
+  --btn-h-md: 2.75rem;
+  --btn-h-lg: 3.25rem;
+  --btn-px-sm: 1rem;
+  --btn-px-md: 1.375rem;
+  --btn-px-lg: 1.75rem;
+  --btn-gap: 0.5rem;
+  --btn-font-sm: 0.8125rem;
+  --btn-font-md: 0.875rem;
+  --btn-font-lg: 0.9375rem;
+  --btn-transition: 260ms var(--ease-emphasized);
+
+  --btn-primary-text: #ffffff;
+  --btn-primary-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(135deg, #416ab4 0%, #2a6eeb 100%);
+  --btn-primary-border: rgba(42, 110, 235, 0.55);
+  --btn-primary-border-hover: rgba(42, 110, 235, 0.8);
+  --btn-primary-shadow: 0 4px 14px rgba(42, 110, 235, 0.22), 0 0 0 1px rgba(65, 106, 180, 0.2);
+  --btn-primary-shadow-hover: 0 6px 20px rgba(42, 110, 235, 0.3), 0 0 0 1px rgba(65, 106, 180, 0.32);
+
+  --btn-secondary-bg: var(--color-elevated);
+  --btn-secondary-bg-hover: var(--color-overlay);
+  --btn-secondary-border: rgba(65, 106, 180, 0.26);
+  --btn-secondary-border-hover: rgba(65, 106, 180, 0.45);
+  --btn-secondary-shadow: var(--shadow-xs);
+
+  --btn-outline-border: rgba(65, 106, 180, 0.4);
+  --btn-outline-border-hover: rgba(65, 106, 180, 0.6);
+  --btn-outline-bg-hover: rgba(65, 106, 180, 0.07);
+  --btn-outline-shadow-hover: 0 0 0 1px rgba(65, 106, 180, 0.15);
+
+  /* ---- Eyebrow badge: the small pill above every section heading
+     ("Why ZUZU", "How it works", ...). Same glass surface + luminous
+     brand-blue border as the button system, scaled down (no hover/press
+     states -- this is a label, not an action). ---- */
+  --eyebrow-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 100%), rgba(65, 106, 180, 0.07);
+  --eyebrow-border: rgba(65, 106, 180, 0.32);
+  --eyebrow-glow: 0 0 0 1px rgba(65, 106, 180, 0.12), 0 2px 8px rgba(14, 30, 66, 0.06);
+
+  /* ---- Container widths ---- */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1440px;
+
+  /* ---- Breakpoints (reference only; Tailwind's defaults are used:
+     sm 640px, md 768px, lg 1024px, xl 1280px, 2xl 1536px) ---- */
+
+  /* ---- Spacing: section rhythm ---- */
+  --space-section-y: 5rem;
+  --space-section-y-lg: 7rem;
+
+  /* ---- Transitions & Durations ---- */
+  --ease-base: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
+  --duration-slow: 480ms;
+  --duration-hero: 800ms;
+  --transition-fast: 160ms var(--ease-base);
+  --transition-base: 280ms var(--ease-base);
+  --transition-slow: 480ms var(--ease-base);
+
+  /* ---- Motion system (site-wide reveal/hero/page-transition animations) ---- */
+  --stagger-step: 70ms;
+}

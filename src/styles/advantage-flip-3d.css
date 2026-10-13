@@ -1,0 +1,126 @@
+/* ==========================================================================
+   AdvantageSection 3D scene (components/ui/AdvantageSection.jsx)
+
+   A genuinely different 3D device from the rest of the site's tilt-toward-
+   cursor work (hero-3d.css, flow-steps-3d.css, why-zuzu-3d.css): each
+   comparison card is a real two-sided flip card. It swings into view on
+   its Y axis as the grid scrolls into view (rather than rising on its X
+   axis like every other card on the site), then on hover flips a full
+   180 degrees to its back face -- a plain, glowing checkmark -- as a
+   small reward for the "old way vs. new way" the section is already
+   making in words. Nothing informational ever lives ONLY on the back:
+   both "Instead of" and "Use" stay on the always-visible front face
+   exactly as before, so the flip is a bonus flourish, not how the
+   content is delivered.
+
+   Two independently-owned transforms on two nested elements, the same
+   ownership split the rest of the site's 3D work uses: the OUTER
+   `.advantage-flip-card` (a grid item) owns the entrance swing; the
+   INNER `.advantage-flip-inner` owns the hover flip. They never fight
+   each other, or card-glass's own hover lift/spotlight on the front
+   face, for the same `transform` property.
+   ========================================================================== */
+
+.advantage-flip-scene {
+  perspective: 1800px;
+}
+
+.advantage-flip-card {
+  transform-style: preserve-3d;
+}
+
+/* Hidden, swung-away resting state before the grid is in view -- pairs
+   with the entrance keyframe below the same way every other
+   ProductReveal role does (see product-motion.css). */
+.pr:not(.is-in) .advantage-flip-card {
+  opacity: 0;
+  transform: perspective(1200px) rotateY(-55deg) translateZ(-50px);
+}
+
+@keyframes advantage-flip-enter {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-55deg) translateZ(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0);
+  }
+}
+
+/* `backwards` (not `both`): once the entrance finishes, its grip on
+   `transform` releases so the card sits flat, ready for the hover flip
+   below to take over through the ordinary cascade. */
+.pr.is-in .advantage-flip-card {
+  animation: advantage-flip-enter 700ms var(--ease-emphasized)
+    calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+.advantage-flip-inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 620ms var(--ease-emphasized);
+}
+
+/* Hover-only, and only on devices that actually have a hover state --
+   guards against the classic mobile "tap flips it, then it's stuck"
+   problem (a touch "hover" has no real un-hover to flip it back). */
+@media (hover: hover) and (pointer: fine) {
+  .advantage-flip-card:hover .advantage-flip-inner {
+    transform: perspective(1000px) rotateY(180deg);
+  }
+}
+
+.advantage-flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.advantage-flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.advantage-flip-check {
+  display: flex;
+  height: 3.25rem;
+  width: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-green-400);
+  background: radial-gradient(circle, rgba(var(--color-green-rgb), 0.22), transparent 72%);
+  box-shadow: 0 0 0 1px rgba(var(--color-green-rgb), 0.35), 0 0 26px rgba(var(--color-green-rgb), 0.35);
+}
+
+/* Mobile/tablet and no-hover devices: keep the swing-in entrance, skip
+   the perspective depth and the flip trigger entirely (it's already
+   inert there via the media query above) -- matching the "reduce 3D
+   movement substantially on mobile" approach used sitewide. */
+@media (max-width: 1023.98px) {
+  .pr:not(.is-in) .advantage-flip-card {
+    transform: translateY(14px);
+  }
+
+  @keyframes advantage-flip-enter {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advantage-flip-inner {
+    transition: none;
+  }
+}

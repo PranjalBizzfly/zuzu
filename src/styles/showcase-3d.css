@@ -1,0 +1,147 @@
+/* ==========================================================================
+   Product showcase 3D (components/ui/ImageSection.jsx, `depth3d` prop)
+
+   The dashboard previews in the Home page's alternating text/visual
+   sections. Each preview sits at a resting perspective angle (turned
+   slightly toward its text column), follows the cursor with the shared
+   `.tilt-3d` mechanic (hooks/useCardSpotlight writes --tilt-rx/--tilt-ry),
+   floats slowly, and carries a glow plate behind it and a light sheen
+   across it for depth.
+
+   Transform ownership (same rule as hero-3d.css): the float lives on the
+   outer `.showcase-3d-float` (via the independent `translate` property),
+   the rotation on the inner `.showcase-3d-card`, and DashboardPreview's own
+   `.pr-main` entrance is untouched inside it.
+
+   Skipped under prefers-reduced-motion; the resting angle is dropped on
+   small screens where the column is full-width.
+   ========================================================================== */
+
+.showcase-3d-scene {
+  position: relative;
+  perspective: 1600px;
+  --showcase-rest-ry: -9deg;
+}
+
+.showcase-3d-scene--reverse {
+  --showcase-rest-ry: 9deg;
+}
+
+/* Glow plate: sits behind the card, pulled back in depth by its blur and
+   offset so the card reads as lifted off the page. */
+.showcase-3d-scene::before {
+  content: '';
+  position: absolute;
+  inset: 8% 4% -6%;
+  border-radius: 1.5rem;
+  background: radial-gradient(ellipse at 50% 60%, rgba(59, 130, 246, 0.28), rgba(59, 130, 246, 0) 70%);
+  filter: blur(28px);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: showcase-3d-glow 6s ease-in-out infinite;
+}
+
+.showcase-3d-float {
+  position: relative;
+  animation: showcase-3d-float 7s ease-in-out infinite;
+}
+
+.showcase-3d-card {
+  position: relative;
+  transform: rotateX(calc(var(--tilt-rx, 0deg) + 3deg)) rotateY(calc(var(--tilt-ry, 0deg) + var(--showcase-rest-ry)));
+  transition: transform 420ms var(--ease-emphasized);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Crisp text on hover: the preview window is a card-glass (backdrop-filter
+   blur + its own hover scale/lift), and stacking those on a rotating 3D
+   layer re-rasterizes the text softly. Inside the showcase the tilt already
+   provides the hover motion, so the window's own blur and hover transform
+   are switched off (visuals and every animation stay as they are). */
+.showcase-3d-card .card-glass,
+.showcase-3d-card .card-glass:hover,
+.showcase-3d-card .pr-lift:hover {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: none;
+}
+
+.showcase-3d-card .backdrop-blur-md,
+.showcase-3d-card .backdrop-blur-sm {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Sheen: a soft diagonal highlight that sweeps across the window. */
+.showcase-3d-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.09) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: 130% 0;
+  pointer-events: none;
+  animation: showcase-3d-sheen 8s ease-in-out infinite;
+}
+
+@keyframes showcase-3d-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes showcase-3d-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes showcase-3d-sheen {
+  0%,
+  55% {
+    background-position: 130% 0;
+  }
+  85%,
+  100% {
+    background-position: -30% 0;
+  }
+}
+
+@media (max-width: 1023.98px) {
+  .showcase-3d-scene {
+    --showcase-rest-ry: 0deg;
+  }
+
+  .showcase-3d-scene--reverse {
+    --showcase-rest-ry: 0deg;
+  }
+
+  .showcase-3d-card {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-3d-scene::before,
+  .showcase-3d-float,
+  .showcase-3d-card::after {
+    animation: none;
+  }
+
+  .showcase-3d-card {
+    transform: none;
+    transition: none;
+  }
+}

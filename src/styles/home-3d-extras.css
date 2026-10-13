@@ -1,0 +1,235 @@
+/* ==========================================================================
+   Home landing page -- remaining 3D treatments
+
+   Every section below was still a flat card grid. Each one gets its own
+   distinct 3D device (never repeating an axis/mechanic already used
+   elsewhere on the page) so the landing page reads as one considered
+   system rather than the same tilt copy-pasted six times:
+
+     Industries        -- photo parallax: the photo drifts opposite the
+                           cursor tilt, behind the card's own frame.
+     Use Case Spotlights -- layered parallax: photo, badge and text each
+                           drift at a different depth on hover.
+     Security          -- materialize: cards scale up from depth with a
+                           spring overshoot as they enter (Z axis, no
+                           rotation -- distinct from every rotate-based
+                           device elsewhere on the page).
+     Before/After      -- depth contrast: "Before" sits pushed back,
+                           "After" sits pulled forward, permanently --
+                           not a hover state, the page's own before/after
+                           point made in actual depth.
+     Practical use cases -- the shared FeatureCard, wrapped (not edited)
+                           in the same cursor-tilt mechanic as "Why ZUZU",
+                           scoped to this page only.
+     Pricing           -- the recommended plan floats persistently above
+                           its neighbours (a translateY float, not a tilt
+                           or rotation -- the plan is calling attention to
+                           itself, not responding to the cursor).
+     Feature marquee   -- each ticket tilts toward the cursor while
+                           paused for reading, same tilt-3d mechanic as
+                           Industries/Practical use cases, without the
+                           parallax photo (there isn't one here).
+
+   All of it is skipped under prefers-reduced-motion, and every
+   cursor-tilt device already relies on hooks/useCardSpotlight, which
+   itself skips touch/coarse pointers.
+   ========================================================================== */
+
+/* ---- Industries: photo parallax -------------------------------------- */
+
+.industry-3d-scene {
+  perspective: 1400px;
+}
+
+.industry-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 340ms var(--ease-emphasized);
+}
+
+.industry-3d-photo {
+  transition: transform 340ms var(--ease-emphasized);
+  /* Drifts opposite the card's own tilt, behind the frame, echoing a
+     photo shifting on a parallax layer rather than the whole card
+     rotating as one flat plane. */
+  transform: translate3d(calc(var(--tilt-ry, 0deg) * -0.9), calc(var(--tilt-rx, 0deg) * 0.9), 0) scale(1.08);
+}
+
+@media (max-width: 1023.98px) {
+  .industry-3d-photo {
+    transform: none;
+  }
+}
+
+/* ---- Use Case Spotlights: layered parallax ---------------------------- */
+
+.spotlight-3d-scene {
+  perspective: 1600px;
+}
+
+.spotlight-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(1100px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 360ms var(--ease-emphasized);
+}
+
+/* Three depths in one card: the photo barely drifts (it's the backdrop),
+   the badge chip drifts more (midground), the body copy stays put (it's
+   the foreground, always meant to read clearly). */
+.spotlight-3d-photo {
+  transition: transform 360ms var(--ease-emphasized);
+  transform: translate3d(calc(var(--tilt-ry, 0deg) * -0.6), calc(var(--tilt-rx, 0deg) * 0.6), 0) scale(1.06);
+}
+
+.spotlight-3d-badge {
+  transition: transform 300ms var(--ease-emphasized);
+  transform: translate3d(calc(var(--tilt-ry, 0deg) * -1.6), calc(var(--tilt-rx, 0deg) * 1.6), 0);
+}
+
+@media (max-width: 1023.98px) {
+  .spotlight-3d-photo,
+  .spotlight-3d-badge {
+    transform: none;
+  }
+}
+
+/* ---- Security: materialize from depth ---------------------------------- */
+
+.security-3d-scene {
+  perspective: 1200px;
+}
+
+.pr:not(.is-in) .security-3d-card {
+  opacity: 0;
+  transform: translateZ(-90px) scale(0.7);
+}
+
+@keyframes security-3d-in {
+  from {
+    opacity: 0;
+    transform: translateZ(-90px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+  }
+}
+
+/* The spring overshoot (--ease-spring) is what sells "materializing" --
+   it settles past its final size before easing back, like it's landing
+   rather than just fading up. `backwards` (not `both`): once the
+   entrance finishes, its grip on `transform` releases and the plain
+   hover rule below -- lifting further along the same Z axis -- takes
+   over through the ordinary cascade, the same pattern used across the
+   site's other ProductReveal cards (e.g. FlowSteps, WhyZuzu). */
+.pr.is-in .security-3d-card {
+  animation: security-3d-in 620ms var(--ease-spring) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+.security-3d-card {
+  transition: transform 260ms var(--ease-emphasized), border-color 260ms var(--ease-emphasized),
+    box-shadow 260ms var(--ease-emphasized);
+}
+
+.security-3d-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--color-green-rgb), 0.4);
+  box-shadow: 0 16px 32px -12px rgba(2, 6, 18, 0.35);
+}
+
+.security-3d-icon {
+  transition: transform 220ms var(--ease-emphasized), box-shadow 220ms var(--ease-emphasized),
+    border-color 220ms var(--ease-emphasized);
+}
+
+.group:hover .security-3d-icon {
+  transform: scale(1.12);
+  border-color: rgba(var(--color-green-rgb), 0.5);
+  box-shadow: 0 6px 18px -4px rgba(var(--color-green-rgb), 0.45);
+}
+
+/* ---- Before/After: depth contrast -------------------------------------- */
+
+.before-after-3d-scene {
+  perspective: 1800px;
+}
+
+/* "Before" sits a little further back and a touch smaller -- not a
+   hover state, a permanent, literal depth cue that echoes the words:
+   the old way recedes, the new way steps forward. */
+.before-3d-panel {
+  transform: perspective(1400px) translateZ(-16px) scale(0.985);
+}
+
+.after-3d-panel {
+  transform: perspective(1400px) translateZ(18px) scale(1.015);
+}
+
+@media (max-width: 1023.98px) {
+  .before-3d-panel,
+  .after-3d-panel {
+    transform: none;
+  }
+}
+
+/* ---- Practical use cases: shared FeatureCard, page-local tilt ---------- */
+
+.usecase-3d-scene {
+  perspective: 1400px;
+}
+
+.usecase-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 320ms var(--ease-emphasized);
+}
+
+/* ---- Pricing: the recommended plan floats --------------------------- */
+
+.pricing-3d-float {
+  animation: pricing-3d-float 4.5s ease-in-out infinite;
+}
+
+@keyframes pricing-3d-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ---- Feature marquee: per-ticket cursor tilt --------------------------- */
+
+.marquee-3d-scene {
+  perspective: 1000px;
+}
+
+.marquee-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(800px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 280ms var(--ease-emphasized);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .industry-3d-card,
+  .industry-3d-photo,
+  .spotlight-3d-card,
+  .spotlight-3d-photo,
+  .spotlight-3d-badge,
+  .usecase-3d-card,
+  .marquee-3d-card,
+  .security-3d-card,
+  .security-3d-icon {
+    transition: none;
+  }
+
+  .security-3d-card:hover {
+    transform: none;
+  }
+
+  .pricing-3d-float {
+    animation: none;
+  }
+}

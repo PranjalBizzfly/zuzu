@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f7fc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a1122" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="description"
+      content="ZUZU is an AI-powered workforce visibility and intelligence platform that helps organizations understand how work actually happens."
+    />
+    <!--
+      Sets [data-theme] before first paint from the same localStorage
+      key ThemeToggle.jsx writes, so there's no flash of the wrong
+      theme on load. Defaults to the visitor's OS preference when they
+      haven't chosen yet; light mode is the app default otherwise.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('zuzu-theme')
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          document.documentElement.setAttribute('data-theme', theme)
+        } catch (e) {}
+      })()
+    </script>
+    <!--
+      Baseline Open Graph / Twitter tags for the initial, pre-JS document.
+      Seo.jsx overwrites title/description/og:url per route after mount.
+      og:url, og:image and JSON-LD "url" are intentionally omitted here --
+      this project has no confirmed production domain to hardcode, and an
+      invented one would be worse than omitting it; Seo.jsx fills og:url
+      per-page from window.location.origin at runtime instead.
+    -->
+    <meta property="og:title" content="ZUZU — AI-Powered Workforce Visibility & Intelligence" />
+    <meta
+      property="og:description"
+      content="ZUZU is an AI-powered workforce visibility and intelligence platform that helps organizations understand how work actually happens."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ZUZU" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="ZUZU — AI-Powered Workforce Visibility & Intelligence" />
+    <meta
+      name="twitter:description"
+      content="ZUZU is an AI-powered workforce visibility and intelligence platform that helps organizations understand how work actually happens."
+    />
+    <title>ZUZU — AI-Powered Workforce Visibility &amp; Intelligence</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "ZUZU",
+        "description": "ZUZU is an AI-powered workforce visibility and intelligence platform that helps organizations understand how work actually happens.",
+        "logo": "/favicon.png"
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

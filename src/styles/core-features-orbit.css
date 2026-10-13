@@ -1,0 +1,352 @@
+/* ==========================================================================
+   Core Features "node graph" animation
+   (src/components/ui/CoreFeaturesOrbit.jsx)
+
+   A glowing center card auto-cycles through the 6 core features while a
+   "Data in" / "Insight out" column on each side fades in and out, linked
+   to the card by a thin rail with a traveling pulse dot. Desktop only --
+   see the component for the simplified stacked mobile layout.
+   ========================================================================== */
+
+.core-orbit-bg-glow {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 58%;
+  height: 70%;
+  background: radial-gradient(ellipse at center, rgba(var(--color-green-rgb), 0.16), transparent 72%);
+  filter: blur(40px);
+  pointer-events: none;
+  animation: core-orbit-glow-pulse 6s var(--ease-base) infinite;
+}
+
+@keyframes core-orbit-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.core-orbit-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(var(--color-green-rgb), 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--color-green-rgb), 0.07) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 75% at 50% 50%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 62% 75% at 50% 50%, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+/* --- Side columns: a vertically-centered list of chips, faded at the
+   top and bottom edges so it reads as continuing past the frame. ---- */
+.core-orbit-side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+}
+
+.core-orbit-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background: var(--color-elevated);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--color-faint);
+  transition: color var(--duration-base) var(--ease-emphasized), border-color var(--duration-base) var(--ease-emphasized),
+    background-color var(--duration-base) var(--ease-emphasized), scale var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-chip.is-active {
+  color: var(--color-ink);
+  font-weight: 500;
+  border-color: rgba(var(--color-green-rgb), 0.4);
+  background: rgba(var(--color-green-rgb), 0.08);
+  scale: 1.04;
+}
+
+.core-orbit-chip-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--color-line-strong);
+  transition: background-color var(--duration-base) var(--ease-emphasized), box-shadow var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-chip.is-active .core-orbit-chip-dot {
+  background: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(var(--color-green-rgb), 0.18);
+}
+
+/* --- Rail: the thin vertical spine + horizontal tick that connects a
+   side column to the center card, with the "Data in"/"Insight out"
+   node pill sitting at the crossing point. ---- */
+.core-orbit-rail {
+  position: relative;
+  z-index: 1;
+}
+
+.core-orbit-rail-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  translate: -50% 0;
+  background: linear-gradient(to bottom, transparent, rgba(var(--color-green-rgb), 0.35) 38%, rgba(var(--color-green-rgb), 0.35) 62%, transparent);
+}
+
+.core-orbit-rail-tick {
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  translate: 0 -50%;
+  background: rgba(var(--color-green-rgb), 0.5);
+}
+
+.core-orbit-rail--left .core-orbit-rail-tick {
+  left: 50%;
+  right: 0;
+}
+
+.core-orbit-rail--right .core-orbit-rail-tick {
+  left: 0;
+  right: 50%;
+}
+
+.core-orbit-rail-pulse {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: var(--color-green);
+  box-shadow: 0 0 6px rgba(var(--color-green-rgb), 0.7);
+  translate: -50% -50%;
+  animation: core-orbit-pulse-move 2.6s var(--ease-base) infinite;
+}
+
+.core-orbit-rail--right .core-orbit-rail-pulse {
+  animation-direction: reverse;
+}
+
+@keyframes core-orbit-pulse-move {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.core-orbit-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--color-elevated);
+  border: 1px solid var(--color-line-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Center card ---------------------------------------------------- */
+.core-orbit-card {
+  position: relative;
+  z-index: 2;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  background: linear-gradient(160deg, rgba(var(--color-green-rgb), 0.16) 0%, rgba(var(--color-green-rgb), 0.04) 55%, transparent 100%),
+    var(--color-elevated);
+  border: 1px solid rgba(var(--color-green-rgb), 0.24);
+  box-shadow: 0 0 0 1px rgba(var(--color-green-rgb), 0.08), 0 30px 60px -24px rgba(14, 30, 66, 0.35),
+    0 0 60px -14px rgba(var(--color-green-rgb), 0.28);
+}
+
+:root[data-theme='dark'] .core-orbit-card,
+.surface-dark .core-orbit-card {
+  box-shadow: 0 0 0 1px rgba(var(--color-green-rgb), 0.14), 0 30px 70px -20px rgba(0, 0, 0, 0.7),
+    0 0 70px -8px rgba(var(--color-green-rgb), 0.38);
+}
+
+.core-orbit-row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-emphasized), border-color var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-row:hover {
+  background: var(--color-overlay);
+}
+
+.core-orbit-row.is-active {
+  background: rgba(var(--color-green-rgb), 0.1);
+  border-color: rgba(var(--color-green-rgb), 0.3);
+}
+
+.core-orbit-row-badge {
+  display: flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--color-line-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-faint);
+  transition: background var(--duration-base) var(--ease-emphasized), color var(--duration-base) var(--ease-emphasized),
+    border-color var(--duration-base) var(--ease-emphasized), box-shadow var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-row.is-active .core-orbit-row-badge {
+  background: var(--gradient-brand);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 0 4px rgba(var(--color-green-rgb), 0.18);
+}
+
+.core-orbit-row-icon {
+  color: var(--color-faint);
+  transition: color var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-row.is-active .core-orbit-row-icon {
+  color: var(--color-green);
+}
+
+.core-orbit-row-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  transition: color var(--duration-base) var(--ease-emphasized), font-weight var(--duration-base) var(--ease-emphasized);
+}
+
+.core-orbit-row.is-active .core-orbit-row-title {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.core-orbit-progress {
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.3rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: rgba(var(--color-green-rgb), 0.15);
+  overflow: hidden;
+}
+
+.core-orbit-progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background: var(--gradient-brand);
+  animation: core-orbit-progress-fill 2.6s linear forwards;
+}
+
+@keyframes core-orbit-progress-fill {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* --- Mobile chip grid ------------------------------------------------ */
+.core-orbit-mobile-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background: var(--color-elevated);
+  padding: 0.9rem 1rem;
+}
+
+.core-orbit-mobile-chip-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 0.15rem;
+}
+
+.core-orbit-mobile-chip-row {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.core-orbit-mobile-chip-label {
+  display: inline-block;
+  min-width: 5.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .core-orbit-bg-glow {
+    animation: none;
+    opacity: 0.75;
+  }
+  .core-orbit-rail-pulse {
+    display: none;
+  }
+  .core-orbit-progress::after {
+    animation: none;
+    scale: 1 1;
+  }
+  .core-orbit-chip.is-active {
+    scale: 1;
+  }
+}

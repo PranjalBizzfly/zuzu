@@ -1,0 +1,333 @@
+/* ==========================================================================
+   Product / dashboard template motion
+   (src/components/motion/ProductReveal.jsx)
+
+   One shared system for every dashboard / product-screenshot / hero-badge
+   template, so no page hand-rolls its own entrance.
+
+   How it works
+   - <ProductReveal> puts `.pr` on a root and adds `.is-in` ONCE, the first
+     time the root scrolls into view (or a frame after mount for heroes).
+   - Everything inside is plain markup carrying a role class. Before `.is-in`
+     the role is hidden; when `.is-in` lands each element plays a one-shot
+     CSS animation whose delay comes from its slot: `--seq` * `--pr-step`.
+   - Entrances are CSS *animations* (fill-mode `backwards`), never
+     transitions. After they finish the element goes back to its natural
+     style, so no leftover transform/stacking context, and hover transitions
+     and the badge float below stay completely independent of the entrance.
+   - Entrance uses the individual `translate` / `scale` properties (not
+     `transform`), so it composes with hover/float transforms on the same
+     element instead of fighting them.
+
+   Roles
+     .pr-main    main container: rise + scale-in + fade        (slot 0)
+     .pr-item    header / card / panel / CTA: short rise + fade
+     .pr-badge   floating badge: slide/fade in, then a barely-there float
+     .pr-bar     horizontal progress fill: grows from the left
+     .pr-col     vertical chart column: grows from the bottom
+     .pr-mock    wrapper for DashboardPreview mockups: header, cards and
+                 panels are staggered from the mockup's own structure, so
+                 the nine mockups need no per-element markup
+     .pr-lift    main container hover (scale <= 1.01)
+     .pr-card    feature-card hover timing (200-250ms)
+
+   Order of the cascade (lowest slot first): main container, header/status,
+   feature cards, panels, floating badges, charts/data, bottom CTA.
+
+   Only opacity / translate / scale animate (compositor-only). No numbers
+   change: this animates how the existing static values are presented.
+   ========================================================================== */
+
+.pr {
+  --pr-ease: var(--ease-emphasized);
+  --pr-dur: 720ms; /* main container */
+  --pr-y: 30px;
+  --pr-scale: 0.97;
+  --pr-item-dur: 560ms; /* everything inside it */
+  --pr-item-y: 12px;
+  --pr-step: 90ms; /* gap between consecutive slots */
+  --pr-base: 0ms; /* whole-cascade offset (set via <ProductReveal base>) */
+}
+
+/* Mobile: shorter travel, smaller scale, tighter stagger, no heavy motion. */
+@media (max-width: 639.98px) {
+  .pr {
+    --pr-dur: 560ms;
+    --pr-y: 18px;
+    --pr-scale: 0.985;
+    --pr-item-dur: 440ms;
+    --pr-item-y: 8px;
+    --pr-step: 60ms;
+  }
+}
+
+@keyframes pr-main-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--pr-y);
+    scale: var(--pr-scale);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes pr-item-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--pr-item-y);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes pr-badge-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--pr-item-y) + 2px);
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+/* The only continuous motion in the system: a 4px drift on floating badges. */
+@keyframes pr-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pr-bar-in {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes pr-col-in {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* --- Hidden until the root scrolls into view --------------------------- */
+
+.pr:not(.is-in) :is(.pr-main, .pr-item, .pr-badge, .pr-mock > * > :not(.grid), .pr-mock > * > .grid > *),
+.pr.pr-main:not(.is-in),
+.pr.pr-badge:not(.is-in) {
+  opacity: 0;
+}
+
+.pr:not(.is-in) .pr-bar {
+  scale: 0 1;
+}
+
+.pr:not(.is-in) .pr-col {
+  scale: 1 0;
+}
+
+/* --- Entrances ---------------------------------------------------------- */
+
+.pr.is-in .pr-main,
+.pr.pr-main.is-in {
+  animation: pr-main-in var(--pr-dur) var(--pr-ease) var(--pr-base) backwards;
+}
+
+.pr.is-in :is(.pr-item, .pr-mock > * > :not(.grid), .pr-mock > * > .grid > *) {
+  animation: pr-item-in var(--pr-item-dur) var(--pr-ease) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+.pr.is-in .pr-badge,
+.pr.pr-badge.is-in {
+  animation: pr-badge-in var(--pr-item-dur) var(--pr-ease) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+/* Float only where it costs nothing: it starts after the entrance, and is
+   skipped on phones to keep scrolling smooth. `--pr-float-phase` desyncs
+   sibling badges so they don't drift in lockstep. */
+@media (min-width: 640px) {
+  .pr.is-in .pr-badge,
+  .pr.pr-badge.is-in {
+    animation:
+      pr-badge-in var(--pr-item-dur) var(--pr-ease) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards,
+      pr-float 4.5s ease-in-out
+        calc(var(--pr-base) + var(--seq, 1) * var(--pr-step) + var(--pr-item-dur) + var(--pr-float-phase, 0ms)) infinite;
+  }
+}
+
+.pr.is-in .pr-bar {
+  transform-origin: left center;
+  animation: pr-bar-in 640ms var(--pr-ease) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+.pr.is-in .pr-col {
+  transform-origin: center bottom;
+  animation: pr-col-in 640ms var(--pr-ease) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+/* --- DashboardPreview mockups: slots come from the markup's own shape ----
+   .pr-mock > (mockup root) > blocks. Each top-level block is one slot (the
+   header first, then cards, tables, ribbons); when a block is a `.grid`, the
+   grid itself stays put and each of ITS children takes a half-slot step, so
+   a row of KPI cards or a chart + side panel ripples in left to right. */
+
+.pr-mock > * > :nth-child(1) {
+  --pi: 1;
+}
+.pr-mock > * > :nth-child(2) {
+  --pi: 2;
+}
+.pr-mock > * > :nth-child(3) {
+  --pi: 3;
+}
+.pr-mock > * > :nth-child(4) {
+  --pi: 4;
+}
+.pr-mock > * > :nth-child(5) {
+  --pi: 5;
+}
+.pr-mock > * > :nth-child(6) {
+  --pi: 6;
+}
+.pr-mock > * > :nth-child(n + 7) {
+  --pi: 7;
+}
+
+.pr-mock > * > .grid > :nth-child(1) {
+  --pj: 0;
+}
+.pr-mock > * > .grid > :nth-child(2) {
+  --pj: 1;
+}
+.pr-mock > * > .grid > :nth-child(3) {
+  --pj: 2;
+}
+.pr-mock > * > .grid > :nth-child(4) {
+  --pj: 3;
+}
+.pr-mock > * > .grid > :nth-child(n + 5) {
+  --pj: 4;
+}
+
+.pr-mock > * > :not(.grid) {
+  --seq: var(--pi, 1);
+}
+
+.pr-mock > * > .grid > * {
+  --seq: calc(var(--pi, 1) + var(--pj, 0) * 0.5);
+}
+
+/* --- Hero dashboard details (HomeWorkdayHero.jsx) ------------------------
+   Each is a one-shot that inherits its tile's `--seq`, so it lands just
+   after the panel it lives in has arrived. Nothing here loops. */
+
+/* Code editor tile: lines appear one after another. */
+@keyframes pr-code-line-in {
+  from {
+    opacity: 0;
+    translate: -6px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.pr:not(.is-in) .code-line {
+  opacity: 0;
+}
+
+.pr.is-in .code-line {
+  animation: pr-code-line-in 380ms var(--pr-ease)
+    calc(var(--pr-base) + var(--seq, 1) * var(--pr-step) + 350ms + var(--i, 0) * 200ms) backwards;
+}
+
+/* Screenshot tiles: a single soft "capture" sweep top to bottom, once. */
+@keyframes pr-capture-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.capture-scan {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(89, 148, 255, 0) 42%,
+    rgba(89, 148, 255, 0.2) 48.5%,
+    rgba(140, 182, 255, 0.5) 50%,
+    rgba(89, 148, 255, 0.2) 51.5%,
+    rgba(89, 148, 255, 0) 58%,
+    transparent 100%
+  );
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.pr.is-in .capture-scan {
+  animation: pr-capture-scan 1.5s var(--ease-base)
+    calc(var(--pr-base) + var(--seq, 1) * var(--pr-step) + 650ms) 1;
+}
+
+/* "Report ready" check mark pops in after its ribbon has arrived. */
+.pr:not(.is-in) .check-pop {
+  opacity: 0;
+}
+
+.pr.is-in .check-pop {
+  animation: success-pop 520ms var(--ease-spring)
+    calc(var(--pr-base) + var(--seq, 1) * var(--pr-step) + 450ms) backwards;
+}
+
+/* --- Hover ----------------------------------------------------------------
+   The main dashboard only breathes: scale 1 -> 1.01, no lift/rotate/tilt.
+   It rides the element's existing transition (card-glass / transition-all),
+   and replaces card-glass's own 3px lift, which is too much on a window this
+   large. */
+.pr-lift:hover {
+  /* A whole-pixel lift, not scale(1.01): a fractional scale resamples every
+     glyph in the window and made the text soft on hover. */
+  transform: translateY(-4px);
+}
+
+/* Feature cards keep card-glass's hover (3px lift, stronger border, deeper
+   shadow, top accent line); this only tightens its timing into the
+   200-250ms range. */
+.pr-card {
+  --duration-base: 230ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-lift:hover {
+    transform: none;
+  }
+}

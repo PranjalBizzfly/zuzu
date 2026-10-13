@@ -1,0 +1,217 @@
+/*
+  UseZuzu Page Layout System
+  --------------------------
+  Site-wide arrangement rules that apply to every page built from the shared
+  templates (home, hubs, clusters, industries, resources, dashboard, ...)
+  without editing each page. Nothing here touches content; it only decides
+  how sections and grids sit on the page.
+
+  Lives in the "utilities" layer (see index.css) on purpose: the grid rules
+  below have to beat Tailwind's own `lg:grid-cols-3`-style utilities.
+*/
+
+/* ==========================================================================
+   1. Section bands
+   --------------------------------------------------------------------------
+   Pages are a stack of <section>s that used to differ only by a hairline.
+   Every second section now sits on a slightly deeper tone (--color-band),
+   so the page reads as a designed sequence of chapters instead of one long
+   flat sheet. Cards are white / elevated, so they keep their contrast on
+   both tones. The first section (the hero) is never banded.
+   ========================================================================== */
+.page-transition > section:nth-of-type(even) {
+  background-color: var(--color-band);
+}
+
+/* ==========================================================================
+   2. Count-aware grids -- no orphan cards
+   --------------------------------------------------------------------------
+   A `lg:grid-cols-3` grid holding 4 cards used to leave a lone card under
+   three others and two-thirds of the row empty. Grids now pick a column
+   layout that fills every row for the number of cards they actually hold.
+   Pure CSS (:has + :nth-child), so it stays correct as content changes.
+   ========================================================================== */
+@media (min-width: 1024px) {
+  /* -- 3-column grids -- */
+  [class~='lg:grid-cols-3']:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(4):last-child),
+  [class~='lg:grid-cols-3']:has(> :nth-child(8):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(10):last-child) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  /* 5 cards: 3 across, then 2 wider ones. Built on a 6-column grid. */
+  [class~='lg:grid-cols-3']:has(> :nth-child(5):last-child),
+  [class~='lg:grid-cols-4']:has(> :nth-child(5):last-child) {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(5):last-child) > *,
+  [class~='lg:grid-cols-4']:has(> :nth-child(5):last-child) > * {
+    grid-column: span 2;
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(5):last-child) > :nth-child(n + 4),
+  [class~='lg:grid-cols-4']:has(> :nth-child(5):last-child) > :nth-child(n + 4) {
+    grid-column: span 3;
+  }
+
+  /* 7 cards: 4 across, then 3 wider ones. Built on a 12-column grid. */
+  [class~='lg:grid-cols-3']:has(> :nth-child(7):last-child),
+  [class~='lg:grid-cols-4']:has(> :nth-child(7):last-child) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(7):last-child) > *,
+  [class~='lg:grid-cols-4']:has(> :nth-child(7):last-child) > * {
+    grid-column: span 3;
+  }
+  [class~='lg:grid-cols-3']:has(> :nth-child(7):last-child) > :nth-child(n + 5),
+  [class~='lg:grid-cols-4']:has(> :nth-child(7):last-child) > :nth-child(n + 5) {
+    grid-column: span 4;
+  }
+
+  /* -- 4-column grids -- */
+  [class~='lg:grid-cols-4']:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  [class~='lg:grid-cols-4']:has(> :nth-child(3):last-child),
+  [class~='lg:grid-cols-4']:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Two-column grids (tablet, and phones-in-landscape): an odd last card spans
+   the full row instead of sitting alone on the left. */
+@media (min-width: 640px) {
+  [class~='sm:grid-cols-2']:not([class*='lg:grid-cols']):not([class*='md:grid-cols']):has(> :last-child:nth-child(odd))
+    > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  [class~='sm:grid-cols-2'][class*='lg:grid-cols']:not([class*='md:grid-cols']):has(> :last-child:nth-child(odd))
+    > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Same rule for grids that switch to two columns at `md:` instead of `sm:`. */
+@media (min-width: 768px) {
+  [class~='md:grid-cols-2']:not([class*='lg:grid-cols']):has(> :last-child:nth-child(odd)) > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  [class~='md:grid-cols-2'][class*='lg:grid-cols']:has(> :last-child:nth-child(odd)) > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ==========================================================================
+   3. Flow rows
+   --------------------------------------------------------------------------
+   Step-by-step diagrams (FlowSteps) fill their container on desktop rather
+   than stopping short at a fixed width, and still scroll on small screens.
+   ========================================================================== */
+.flow-steps > ol {
+  min-width: 100%;
+}
+
+/* ==========================================================================
+   4. Closing CTA panel
+   --------------------------------------------------------------------------
+   The closing panel on each page (see components/ui/CTA.jsx). Built only
+   from the approved brand blues and it follows the theme: light mode is a
+   pale blue wash with soft glows; dark mode deepens the same idea into a
+   midnight-to-royal gradient. Both carry a faint engineered grid that fades
+   out toward the edges.
+   ========================================================================== */
+.cta-panel {
+  background:
+    radial-gradient(80% 120% at 12% -10%, rgba(89, 148, 255, 0.22) 0%, transparent 55%),
+    radial-gradient(70% 110% at 100% 110%, rgba(42, 110, 235, 0.16) 0%, transparent 60%),
+    linear-gradient(135deg, #f7faff 0%, #eaf1ff 55%, #dce8ff 100%);
+  border: 1px solid rgba(65, 106, 180, 0.22);
+  box-shadow: 0 40px 90px -46px rgba(42, 110, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+:root[data-theme='dark'] .cta-panel {
+  background:
+    radial-gradient(80% 120% at 12% -10%, rgba(89, 148, 255, 0.34) 0%, transparent 55%),
+    radial-gradient(70% 110% at 100% 110%, rgba(42, 110, 235, 0.32) 0%, transparent 60%),
+    linear-gradient(135deg, #0b1530 0%, #112659 55%, #17358a 100%);
+  border: 1px solid rgba(141, 182, 255, 0.22);
+  box-shadow: 0 40px 90px -40px rgba(23, 53, 138, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.cta-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(42, 110, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 110, 235, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(70% 90% at 50% 50%, #000 20%, transparent 100%);
+  mask-image: radial-gradient(70% 90% at 50% 50%, #000 20%, transparent 100%);
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .cta-panel::before {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* ==========================================================================
+   5. Hand-built cards
+   --------------------------------------------------------------------------
+   Many pages build their own bordered white panels instead of using <Card>.
+   They get the same layered depth as the shared card surface so the whole
+   site reads as one system. Skipped for anything that already sets its own
+   shadow, and for the dark hero / photo overlays (which have no bg-surface).
+   ========================================================================== */
+main [class~='border-line'][class~='bg-surface'][class*='rounded-']:not([class*='shadow-']) {
+  box-shadow: 0 1px 2px rgba(14, 30, 66, 0.04), 0 12px 28px -14px rgba(14, 30, 66, 0.14);
+}
+:root[data-theme='dark'] main [class~='border-line'][class~='bg-surface'][class*='rounded-']:not([class*='shadow-']) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 34px -16px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   6. Section titles
+   --------------------------------------------------------------------------
+   A left-aligned section title (hub group headings such as "Monitoring",
+   "Activity & Time Tracking") gets a slim brand-gradient bar so it anchors
+   the group beneath it. Centered SectionHeader titles are wrapped in their
+   own div and are not affected.
+   ========================================================================== */
+.page-transition > section > div > h2:first-child {
+  position: relative;
+  padding-left: 1rem;
+}
+.page-transition > section > div > h2:first-child::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.18em;
+  bottom: 0.18em;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--gradient-brand);
+}
+
+/* ==========================================================================
+   7. Phone grids
+   --------------------------------------------------------------------------
+   A grid that only declares columns from `sm:` up (e.g. `grid sm:grid-cols-2`)
+   has no column template on phones, so its single implicit column is sized to
+   its content: one long unbreakable string stretches the whole grid past the
+   screen and forces sideways scrolling. Give those grids an explicit
+   one-column template below the `sm` breakpoint.
+   ========================================================================== */
+@media (max-width: 639.98px) {
+  main .grid:not([class^='grid-cols-']):not([class*=' grid-cols-']):not([class*='grid-flow']):not([class*='grid-rows']) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

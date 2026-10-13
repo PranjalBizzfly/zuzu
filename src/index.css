@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+/* dark: utilities target [data-theme="dark"] (set by ThemeToggle.jsx
+   and the no-flash script in index.html) instead of Tailwind's
+   default OS-media-query-only dark mode. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@import './styles/tokens.css';
+
+/*
+  base.css must live inside Tailwind's "base" layer, not as a plain
+  unlayered import. Per the CSS Cascade Layers spec, unlayered styles
+  always beat every layered style (including the "utilities" layer),
+  regardless of selector specificity or source order. Left unlayered,
+  its `h1..h6`/`p { color: ... }` reset silently overrode any
+  component's `text-white`/`text-slate-*`/etc. utility classes on
+  those elements sitewide -- invisible in dark mode only because
+  --color-ink/--color-muted happen to resolve close to white/gray
+  there, but breaking badly in light mode where they resolve dark.
+*/
+@layer base {
+  @import './styles/base.css';
+}
+
+@layer utilities {
+  @import './styles/buttons.css';
+  @import './styles/motion.css';
+  @import './styles/product-motion.css';
+  @import './styles/hero-3d.css';
+  @import './styles/flow-steps-3d.css';
+  @import './styles/core-features-orbit.css';
+  @import './styles/why-zuzu-3d.css';
+  @import './styles/advantage-flip-3d.css';
+  @import './styles/home-3d-extras.css';
+  @import './styles/showcase-3d.css';
+  @import './styles/layout.css';
+}

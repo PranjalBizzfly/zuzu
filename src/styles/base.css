@@ -1,0 +1,260 @@
+/* Global base styles built on top of tokens.css */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  width: 100%;
+  /* Not overflow-x: hidden here on purpose: setting a non-visible
+     overflow on `body` forces its overflow-y to compute as `auto`
+     too (per the CSS overflow spec's "the other axis becomes auto"
+     pairing rule), which turns body into its own scroll container.
+     That breaks position:sticky on header.jsx -- its containing
+     scrollport becomes body's (which never scrolls internally, since
+     the page actually scrolls at the html/document level) instead of
+     the real viewport, so the "stick once scrolled past" trigger never
+     fires and the header just scrolls away. `html`'s overflow-x:hidden
+     below already fully prevents horizontal scrollbars/bleed and is
+     safe because html IS the root scrolling element already. */
+  background-color: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Soft ambient glow bleeding down from the very top of the page, behind
+   the header -- the subtle-depth technique premium dark SaaS sites (Linear,
+   Vercel, Stripe) use so a dark theme reads as "rich" rather than a flat
+   single-tone slab. Built from --color-green-rgb (the brand accent) so it
+   always matches the current accent automatically; dark mode only, since
+   light mode's bright base doesn't need it. */
+:root[data-theme='dark'] body {
+  background-image: radial-gradient(60% 32% at 50% 0%, rgba(var(--color-green-rgb), 0.1), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+/* Light mode gets the same technique at a much lower strength: a faint
+   brand-blue wash from the top so the off-white page reads as a designed
+   surface rather than a flat browser-default white. */
+:root[data-theme='light'] body {
+  background-image: radial-gradient(70% 34% at 50% 0%, rgba(var(--color-green-rgb), 0.07), transparent 72%);
+  background-repeat: no-repeat;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--color-green);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-green-400);
+  outline-offset: 2px;
+}
+
+/* Chrome/Edge/Safari force a light yellow/white background + black text
+   onto autofilled fields (saved name/email/phone), ignoring the input's
+   own dark theme -- this is what makes a form field flash white in dark
+   mode the moment the browser autofills it. The only reliable override
+   is an inset box-shadow large enough to fully cover the field (there is
+   no way to just unset the autofill background), painted in the current
+   theme's own surface color so it tracks light/dark automatically. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-elevated) inset !important;
+  box-shadow: 0 0 0 1000px var(--color-elevated) inset !important;
+  background-color: var(--color-elevated) !important;
+  -webkit-text-fill-color: var(--color-ink) !important;
+  color: var(--color-ink) !important;
+  caret-color: var(--color-ink);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-ink);
+}
+
+/* Sub-heads step down to Semi Bold, matching the brand type scale
+   (Light / Regular / Medium / Semi Bold / Bold). */
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+/* Marketing-grade scale: the hero h1 is set per-page; section headings (h2)
+   are large and tight enough to anchor a section, sub-heads (h3) step down
+   clearly, and body copy sits at a comfortable reading size. Components that
+   need something smaller (card titles, dense panels) set their own size. */
+h1 {
+  font-size: clamp(1.75rem, 1.55rem + 0.9vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Site-wide rule: every h1/h2 renders in title case regardless of how
+   the source string is written, so no heading string needs to be
+   hand-edited to match -- text-transform: capitalize only uppercases
+   the first letter of each word and leaves the rest alone, so an
+   already-uppercase brand name (ZUZU, AI) is untouched. */
+h1,
+h2 {
+  text-transform: capitalize;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+h3 {
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.3;
+}
+
+p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* Reusable brand gradient text (headline accents, logo wordmark) */
+.text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Last two words of every h1/h2 (see components/motion/accentRange.js). The
+   gradient is the exact one on the home hero's rotating phrase, so headings
+   sitewide share that one blue. `clone` repeats it on each line when the
+   accent wraps, instead of stretching one gradient across the break. */
+.heading-accent {
+  background-image: linear-gradient(to right, #2a6eeb, #5994ff, #416ab4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Page-level content container, width driven by design tokens */
+.container-page {
+  width: 100%;
+  max-width: var(--container-2xl);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .container-page {
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-page {
+    padding-inline: 3rem;
+  }
+}
+
+/* Subtle scrollbar, theme-aware via the same surface tokens */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-overlay);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-page);
+}
+
+/* Hides the scrollbar track/thumb on an overflow-scroll container while
+   leaving the scroll itself (touch swipe, trackpad, drag) fully working --
+   for horizontal strips like FlowSteps where a visible scrollbar bar reads
+   as a stray UI element rather than an intentional control. */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Single global kill switch for every animation/transition mechanism
+   introduced by the motion system (CSS keyframes, CSS transitions, and
+   -- via the useReducedMotion() hook -- the JS-driven reveal/counter/
+   parallax logic). !important is intentional and scoped narrowly to
+   duration/iteration properties so it can't fight component-level
+   colors, layout or focus styles -- only motion is neutralized, and
+   the underlying opacity/transform end states (already applied by the
+   .in-view/.is-open classes at that point) remain, so content stays
+   fully visible and usable, just without movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

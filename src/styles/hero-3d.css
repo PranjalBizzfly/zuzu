@@ -1,0 +1,247 @@
+/* ==========================================================================
+   Hero "3D workforce intelligence" scene (components/ui/HomeWorkdayHero.jsx)
+
+   A restrained product-showcase treatment layered ON TOP of the existing
+   ProductReveal entrance system (product-motion.css), not a replacement
+   for it: a soft platform + orbit rings behind the dashboard, a few
+   drifting particles, and a cursor-driven tilt shared by the dashboard and
+   its floating badges/cards.
+
+   Cursor tilt: hooks/useTiltParallax.js writes --tilt-x / --tilt-y (a few
+   px) onto .hero-3d-scene as the pointer moves; every .hero-3d-layer reads
+   them back through its own --tilt-depth so layers drift at slightly
+   different rates. The tilt lives on a wrapping `.hero-3d-layer` element
+   rather than directly on a `.pr-*` element, because `.pr-main`'s scale/rise
+   entrance and hover lift, and `.pr-badge`'s float loop, already animate
+   `translate` / `scale` / `transform` on that same element -- two nested
+   elements can each own their own transform without the two fighting over
+   the same CSS property. Skipped entirely on touch and
+   prefers-reduced-motion (handled in the hook; the fallback 0px below
+   covers the same case for anyone rendering without JS).
+   ========================================================================== */
+
+.hero-3d-scene {
+  position: relative;
+  --tilt-x: 0px;
+  --tilt-y: 0px;
+}
+
+.hero-3d-layer {
+  /* 2D translate (not translate3d, which forces a GPU layer that resamples
+     text) snapped to whole pixels, so text stays crisp while the layers
+     drift. The first declaration is the fallback for browsers without
+     round(). */
+  transform: translate(calc(var(--tilt-x) * var(--tilt-depth, 1)), calc(var(--tilt-y) * var(--tilt-depth, 1)));
+  transform: translate(round(calc(var(--tilt-x) * var(--tilt-depth, 1)), 1px), round(calc(var(--tilt-y) * var(--tilt-depth, 1)), 1px));
+  transition: transform 350ms var(--ease-emphasized);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d-layer {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --- Continuous 3D sway of the main dashboard window. Lives on its own
+   wrapper (.hero-3d-float) between the cursor-tilt layer and .pr-main so it
+   never competes with either for `transform`. A slow, small perspective
+   rotation plus a gentle rise/fall, looping back and forth forever; it
+   starts after the entrance animation has finished (1.6s delay), and is
+   switched off for prefers-reduced-motion (base.css also zeroes animation
+   durations globally as a second safety net). Angles are kept under 3deg
+   so the text stays legible throughout. ---- */
+.hero-3d-float {
+  transform-origin: 50% 55%;
+  animation: hero-3d-sway 9s ease-in-out 1.6s infinite alternate;
+}
+
+@keyframes hero-3d-sway {
+  0% {
+    transform: perspective(1600px) translateY(0) rotateX(0deg) rotateY(-2.4deg);
+  }
+  50% {
+    transform: perspective(1600px) translateY(-7px) rotateX(1.6deg) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(1600px) translateY(1px) rotateX(-0.8deg) rotateY(2.4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d-float {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* --- Platform: two concentric rings plus a soft glow behind the
+   dashboard's bottom edge -- a product-showcase pedestal, not a gaming
+   one. Purely decorative (aria-hidden), so it borrows the generic
+   `.pr-item` fade + rise entrance rather than a bespoke keyframe. ---- */
+.hero-3d-platform {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: min(94%, 760px);
+  height: 120px;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .hero-3d-platform {
+    bottom: -28px;
+    height: 160px;
+  }
+}
+
+.hero-3d-platform-ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--color-green-rgb), 0.16);
+}
+
+.hero-3d-platform-ring--outer {
+  width: 100%;
+  aspect-ratio: 5.5 / 1;
+}
+
+.hero-3d-platform-ring--inner {
+  width: 68%;
+  aspect-ratio: 6.5 / 1;
+  border-color: rgba(var(--color-green-rgb), 0.26);
+}
+
+.hero-3d-platform-glow {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 82%;
+  aspect-ratio: 4 / 1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(var(--color-green-rgb), 0.22), transparent 72%);
+  filter: blur(2px);
+  animation: hero-platform-pulse 6s var(--ease-base) infinite;
+}
+
+@keyframes hero-platform-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* --- Orbit lines: two thin ellipses that rotate almost imperceptibly
+   slowly around the dashboard. `rotate` is an individual transform
+   property (not the `transform` shorthand), which is what lets it run
+   alongside `pr-item-in`'s opacity/translate entrance in one `animation`
+   list below without the two competing over the same property. ---- */
+.hero-3d-orbit {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-3d-orbit--a {
+  width: 108%;
+  aspect-ratio: 2.5 / 1;
+  border: 1px solid rgba(var(--color-green-rgb), 0.12);
+}
+
+.hero-3d-orbit--b {
+  width: 84%;
+  aspect-ratio: 2.1 / 1;
+  border: 1px solid rgba(var(--color-green-rgb), 0.09);
+}
+
+.pr:not(.is-in) .hero-3d-orbit {
+  opacity: 0;
+}
+
+.pr.is-in .hero-3d-orbit--a {
+  animation: pr-item-in 640ms var(--ease-emphasized) calc(var(--pr-base) + 4.8 * var(--pr-step)) backwards,
+    hero-orbit-spin 80s linear calc(var(--pr-base) + 4.8 * var(--pr-step) + 640ms) infinite;
+}
+
+.pr.is-in .hero-3d-orbit--b {
+  animation: pr-item-in 640ms var(--ease-emphasized) calc(var(--pr-base) + 5 * var(--pr-step)) backwards,
+    hero-orbit-spin-reverse 110s linear calc(var(--pr-base) + 5 * var(--pr-step) + 640ms) infinite;
+}
+
+@keyframes hero-orbit-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes hero-orbit-spin-reverse {
+  from {
+    rotate: 360deg;
+  }
+  to {
+    rotate: 0deg;
+  }
+}
+
+/* --- Particles: a handful of restrained drifting dots. The opacity
+   fade-in (hero-particle-appear) and the continuous drift
+   (hero-particle-drift, on `translate`) are separate keyframes on separate
+   properties for the same reason as the orbit lines above. ---- */
+.hero-3d-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(var(--color-green-rgb), 0.55);
+  box-shadow: 0 0 6px rgba(var(--color-green-rgb), 0.4);
+  pointer-events: none;
+}
+
+.pr:not(.is-in) .hero-3d-particle {
+  opacity: 0;
+}
+
+.pr.is-in .hero-3d-particle {
+  animation: hero-particle-appear 700ms var(--ease-emphasized)
+      calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards,
+    hero-particle-drift var(--particle-dur, 10s) var(--ease-base) var(--particle-delay, 0s) infinite;
+}
+
+@keyframes hero-particle-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-particle-drift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+/* Mobile: the scene stays readable and the dashboard stacks below the
+   content -- drop the decorative depth cues entirely rather than shrink
+   them, per the "reduce 3D movement substantially on mobile" spec. */
+@media (max-width: 639.98px) {
+  .hero-3d-platform,
+  .hero-3d-orbit,
+  .hero-3d-particle {
+    display: none;
+  }
+}

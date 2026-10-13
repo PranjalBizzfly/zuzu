@@ -1,0 +1,29 @@
+# Netlify configuration for the ZUZU website (Vite + React SPA).
+# Deploy source: https://github.com/rahul1xl/UseZuzuWebsite (branch: main)
+# Deploy target: https://usezuzu123.netlify.app/
+
+[build]
+  # `npm run build` runs the `prebuild` script (scripts/generate-sitemap.mjs,
+  # which regenerates public/sitemap.xml + public/robots.txt) and then
+  # `vite build`. The sitemap script reads SITE_URL. It defaults to this
+  # site's address so robots.txt / sitemap.xml never point at the
+  # https://example.com placeholder in production. To use a custom domain
+  # later, set a SITE_URL variable in the Netlify dashboard (Site
+  # configuration > Environment variables); it overrides this default.
+  command = 'SITE_URL="${SITE_URL:-https://usezuzu123.netlify.app}" npm run build'
+  publish = "dist"
+
+[build.environment]
+  # Vite 8 / rolldown need Node ^20.19 or >=22.12; ESLint 10 needs ^20.19,
+  # ^22.13 or >=24. Node 22 (LTS) satisfies all of them.
+  NODE_VERSION = "22"
+
+# The site uses React Router's browser router (clean URLs like
+# /product/admin-portal), so every path that is not a real file must be
+# served index.html. Status 200 = rewrite (URL stays as typed). Real files
+# (assets, images, sitemap.xml, robots.txt) are served first because this
+# rule is not forced.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

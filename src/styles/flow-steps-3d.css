@@ -1,0 +1,187 @@
+/* ==========================================================================
+   FlowSteps 3D scene (components/ui/FlowSteps.jsx)
+
+   The "how it works" step row as a small product-showcase scene: each step
+   tilts up into place as the row scrolls into view, then tilts live toward
+   the cursor on hover (same delegated pointer listener as the card-glass
+   spotlight -- see hooks/useCardSpotlight.js), and a soft pulse travels
+   along the connecting arrows to echo the section's own point, that this
+   is one connected system, device to insight.
+
+   Ownership follows the rest of the site's 3D work (hero-3d.css): the
+   entrance/tilt transform lives on `.flow-3d-card`, a wrapper AROUND the
+   existing `.card-glass` element rather than on it, so this never fights
+   card-glass's own hover lift/shadow/spotlight for the same `transform`
+   property -- two nested elements, two independently-owned transforms.
+   ========================================================================== */
+
+.flow-3d-scene {
+  perspective: 1400px;
+}
+
+.flow-3d-card {
+  transform-style: preserve-3d;
+  transform: perspective(900px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transition: transform 320ms var(--ease-emphasized);
+}
+
+/* Hidden, tilted-back-and-away resting state before the row is in view --
+   pairs with the entrance keyframe below the same way every other
+   ProductReveal role does (see product-motion.css). */
+.pr:not(.is-in) .flow-3d-card {
+  opacity: 0;
+  transform: perspective(900px) rotateX(-16deg) translateY(16px) translateZ(-46px);
+}
+
+@keyframes flow-3d-in {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateX(-16deg) translateY(16px) translateZ(-46px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(900px) rotateX(0deg) translateY(0) translateZ(0);
+  }
+}
+
+/* `backwards` (not `both`): once the entrance finishes, its grip on
+   `transform` releases and the plain rule above -- the live cursor tilt --
+   takes over through the ordinary cascade, so hover keeps working
+   afterwards instead of staying pinned to the animation's final frame. */
+.pr.is-in .flow-3d-card {
+  animation: flow-3d-in 720ms var(--ease-emphasized) calc(var(--pr-base) + var(--seq, 1) * var(--pr-step)) backwards;
+}
+
+/* Icon "lift": depth read through scale + glow rather than a literal
+   translateZ, which would need `transform-style: preserve-3d` on every
+   intermediate ancestor (including card-glass's own hover transform) to
+   render correctly -- scale/shadow is the same depth cue used by every
+   other icon chip on the site (FeatureCard, HomeWorkdayHero), just given a
+   brighter glow here to match the rest of this scene. */
+.flow-3d-icon {
+  transition: transform 220ms var(--ease-emphasized), box-shadow 220ms var(--ease-emphasized),
+    border-color 220ms var(--ease-emphasized);
+}
+
+.group:hover .flow-3d-icon {
+  transform: scale(1.14);
+  border-color: rgba(var(--color-green-rgb), 0.5);
+  box-shadow: 0 6px 18px -4px rgba(var(--color-green-rgb), 0.45);
+}
+
+/* Baseline: a faint glowing line threading through the row at card-center
+   height, behind the cards. Lives inside the scrolling track (not the
+   viewport wrapper) so it scrolls with the steps on narrow screens. */
+.flow-3d-baseline {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-green-rgb), 0.28) 12%,
+    rgba(var(--color-green-rgb), 0.28) 88%,
+    transparent 100%
+  );
+  animation: flow-3d-baseline-pulse 5s var(--ease-base) infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes flow-3d-baseline-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Steps and arrows sit above the baseline line. */
+.flow-3d-card,
+.flow-3d-arrow {
+  position: relative;
+  z-index: 1;
+}
+
+/* Pulse: a small glowing dot that sweeps left-to-right along each
+   connecting arrow, staggered per position so the wave reads as travelling
+   through the whole chain once, then loops slowly -- an ambient detail,
+   not a constant flashy sweep. */
+.flow-3d-arrow {
+  overflow: hidden;
+}
+
+.flow-3d-pulse {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-green-400);
+  box-shadow: 0 0 8px 1px rgba(var(--color-green-rgb), 0.85);
+  opacity: 0;
+  animation: flow-3d-pulse-travel 4.5s var(--ease-base) infinite;
+  animation-delay: calc(1.4s + var(--seq, 1) * 220ms);
+}
+
+@keyframes flow-3d-pulse-travel {
+  0% {
+    transform: translate(-4px, -50%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(24px, -50%);
+    opacity: 0;
+  }
+}
+
+/* Mobile: the row already scrolls horizontally at a readable minimum
+   width -- keep the entrance, drop the finer ambient detail (baseline
+   glow, arrow pulses) and the perspective depth, matching the "reduce 3D
+   movement substantially on mobile" approach already used in hero-3d.css.
+   Hover tilt itself never applies here (useCardSpotlight is skipped on
+   coarse/touch pointers). */
+@media (max-width: 639.98px) {
+  .flow-3d-baseline,
+  .flow-3d-pulse {
+    display: none;
+  }
+
+  .pr:not(.is-in) .flow-3d-card {
+    transform: translateY(10px);
+  }
+
+  @keyframes flow-3d-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-3d-baseline,
+  .flow-3d-pulse {
+    animation: none !important;
+  }
+
+  .flow-3d-card {
+    transition: none;
+  }
+}

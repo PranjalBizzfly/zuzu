@@ -1,0 +1,635 @@
+/*
+  Structured content for the ZUZU Learning ecosystem (Phase 15) --
+  plain-language "what is X" educational pages, distinct in intent from
+  both the product-capability pages (ZUZU-first pitch) and the Use
+  Cases cluster (business-problem-first): these read like a glossary
+  entry -- define the general industry concept, then connect to how
+  ZUZU relates via `externalLinks` to the real deep-dive page.
+
+  Basepath is /learning rather than nested under /resources, since the
+  existing /resources/* nav items are flat, single-route stubs with no
+  support for sub-routes -- /resources/guides and /resources/how-to are
+  enriched separately to link INTO this cluster instead of duplicating
+  it. This matches the phase brief's own fallback ("/resources and/or
+  /learning").
+*/
+
+const ORDER_DEFAULT = ['visual', 'benefits', 'features', 'howItWorks']
+const ORDER_B = ['visual', 'howItWorks', 'benefits', 'features']
+const ORDER_C = ['visual', 'features', 'howItWorks', 'benefits']
+
+export const LEARNING_GROUPS = [
+  { key: 'core', label: 'Activity, Attendance & Workday' },
+  { key: 'intelligence', label: 'Analytics, AI & Screenshots' },
+  { key: 'distributed', label: 'Remote, Hybrid & Reporting' },
+  { key: 'platform', label: 'Software Categories' },
+  { key: 'people', label: 'Admin, Manager & Privacy Concepts' },
+]
+
+export const LEARNING_PAGES = [
+  {
+    slug: 'how-zuzu-works',
+    title: 'How Does ZUZU Actually Work? An End-to-End Walkthrough',
+    cluster: 'platform',
+    visual: 'dashboard',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription:
+      'A step-by-step walkthrough of how ZUZU actually works, from the Windows agent capturing data on a device through to a report reaching a manager.',
+    intro:
+      "Every other page in this learning center explains one piece of ZUZU on its own, activity, attendance, screenshots, reports. This page walks through how those pieces connect, in the order they actually happen: from data captured on a device to a report a manager can act on.",
+    howItWorksNote:
+      "The chain is the same for every organization: the Windows agent captures data, screenshots are redacted on-device before storage, AI reports summarize what was captured, and the manager workspace or admin portal surfaces it to the right person, scoped to their role.",
+    features: ['windowsAgent', 'employeeActivity', 'screenshotMonitoring', 'aiReports'],
+    privacy: true,
+    benefits: [
+      'One place that connects every capability instead of explaining each in isolation',
+      'Follows the actual order data moves through ZUZU, not a feature list',
+      'Makes it clear where privacy protections sit in the chain, not bolted on after',
+    ],
+    useCases: [
+      { title: 'Evaluating ZUZU Before Rollout', description: 'Understand the full chain, not just individual features, before deciding.' },
+      { title: 'Explaining ZUZU to a Team', description: 'Walk a new manager or employee through how it actually works, start to finish.' },
+    ],
+    faq: [
+      {
+        question: 'What are the steps, in order, from capture to a manager seeing a report?',
+        answer:
+          "The Windows agent captures activity, attendance and screenshot data on the device. Screenshots are redacted on-device for private regions before they're stored or uploaded. AI reports then summarize the captured data. Finally, the manager workspace surfaces it to a manager for their team, or the admin portal for an admin, organization-wide.",
+      },
+      {
+        question: 'Where in this chain does privacy get applied?',
+        answer:
+          'At the capture step itself, private-region redaction happens on the device, before a screenshot is ever stored or uploaded, not as a later cleanup step.',
+      },
+      {
+        question: 'Does every organization see the same chain, or is it configurable?',
+        answer:
+          'The chain is the same; what varies is configuration within it, screenshot intervals and privacy controls are set per organization through the admin portal.',
+      },
+      {
+        question: 'Does this chain work the same for remote employees as in-office ones?',
+        answer:
+          "Yes, the Windows agent, screenshot redaction, AI reports and manager workspace or admin portal all work identically regardless of where a device is located or what network it's on.",
+      },
+      {
+        question: 'What happens if a device is offline when the Agent tries to capture or send data?',
+        answer:
+          'The Windows agent queues captures locally and sends them once the device reconnects, nothing in the chain requires a constant connection.',
+      },
+      {
+        question: 'How does the Windows Agent itself stay current?',
+        answer:
+          "It receives updates automatically from the organization's release feed, rather than an admin having to push updates to each device individually.",
+      },
+      {
+        question: 'Where do things like Workforce Analytics or the burnout forecast fit into this chain?',
+        answer:
+          'They sit downstream of capture and reporting, workforce analytics and the wellbeing & burnout forecast are built from the same activity and attendance data already captured, surfaced through the admin portal rather than coming from a separate data source.',
+      },
+      {
+        question: 'Does this chain include payroll processing at any step?',
+        answer:
+          'No, ZUZU does not process payroll or integrate with payroll or accounting systems. The chain ends at reports and insights reaching a manager or admin, not at payment.',
+      },
+    ],
+    related: ['employee-monitoring-software', 'windows-agent', 'screenshot-monitoring', 'ai-workforce-reports'],
+    externalLinks: [
+      { title: 'ZUZU Windows Agent', description: 'The capture layer this walkthrough starts with.', href: '/windows-agent' },
+      { title: 'Private Region Redaction', description: 'How redaction fits in before storage or upload.', href: '/screenshot-privacy/private-region-redaction' },
+      { title: 'AI Employee Reports', description: 'How captured data becomes a report.', href: '/ai-analytics/ai-employee-reports' },
+      { title: 'Manager Insight Workflow', description: 'Where a report ends up for a manager.', href: '/manager/manager-insight-workflow' },
+    ],
+  },
+  {
+    slug: 'employee-activity-monitoring',
+    title: 'What Is Employee Activity Monitoring?',
+    cluster: 'core',
+    visual: 'dashboard',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: 'A plain-language explanation of what employee activity monitoring is, how it works, and how ZUZU relates to it.',
+    intro:
+      'Employee activity monitoring is software that records how employees use their work devices, the applications, websites and tasks that make up a workday, so organizations have visibility into work patterns without relying on manual updates.',
+    howItWorksNote: "Generally, activity monitoring software runs an agent on an employee's device that records activity data; ZUZU does this through its Windows agent, feeding into employee activity and reports.",
+    features: ['employeeActivity', 'windowsAgent', 'privacyControls', 'managerWorkspace'],
+    privacy: true,
+    benefits: ['Visibility into work patterns without manual check-ins', 'Useful for distributed or hybrid teams', 'Typically paired with privacy controls to define monitoring boundaries'],
+    useCases: [
+      { title: 'Understanding How a Distributed Team Works', description: 'Get visibility without in-person observation.' },
+      { title: 'Evaluating Tool Usage Across a Team', description: 'See which applications or sites are actually used.' },
+    ],
+    faq: [
+      { question: 'Is employee activity monitoring the same as surveillance?', answer: 'It depends on implementation, tools like ZUZU pair activity data with configurable privacy controls rather than capturing everything by default.' },
+      { question: 'How does ZUZU implement employee activity monitoring?', answer: 'Through the Windows agent, feeding into employee activity and AI reports.' },
+      { question: 'How is employee activity monitoring different from employee monitoring software as a category?', answer: 'Activity monitoring is one component, recording application and website usage. "employee monitoring software" is the broader category that also includes attendance, screenshots and reporting; ZUZU\'s employee activity capability is one piece of that wider platform.' },
+      { question: 'Is employee activity monitoring the same as workforce visibility?', answer: "Not exactly, workforce visibility is the broader goal of understanding how a team works. Activity monitoring is one of the data sources, alongside attendance and screenshots, that ZUZU combines to deliver it." },
+      { question: "Does ZUZU's activity monitoring work on Mac or Linux devices?", answer: 'No, the Windows agent is Windows-only; ZUZU does not offer a macOS or Linux agent.' },
+      { question: "Who can see an individual employee's activity data?", answer: "Their manager, through the manager workspace scoped to that manager's own team, and admins through the admin portal at an organization-wide level." },
+      { question: "Does activity monitoring work differently for a remote employee's personal laptop?", answer: "Yes, on a personal device, capture is consent-gated and session-based: it only runs between punch-in and punch-out, through a short-lived permission the agent has to keep renewing, so it expires automatically outside a work session." },
+      { question: 'Can activity data be exported out of ZUZU?', answer: 'Yes, activity data feeds into reports that can be exported as CSV, Excel or PDF.' },
+    ],
+    related: ['attendance-monitoring', 'workday-tracking', 'screenshot-monitoring'],
+    externalLinks: [{ title: 'Employee Work Activity', description: "ZUZU's employee activity capability in depth.", href: '/activity/employee-work-activity' }],
+  },
+  {
+    slug: 'attendance-monitoring',
+    title: 'What Is Employee Attendance Monitoring?',
+    cluster: 'core',
+    visual: 'dashboard',
+    sectionOrder: ORDER_B,
+    metaDescription: 'A plain-language explanation of what employee attendance monitoring is and how ZUZU implements it.',
+    intro:
+      'Employee attendance monitoring is the practice of recording when employees start and stop working, automatically, rather than through manual sign-in sheets or self-reported timesheets.',
+    howItWorksNote: 'Software-based attendance monitoring typically records device activity as a proxy for working hours; ZUZU does this through time & attendance, based on Windows agent data.',
+    features: ['timeAttendance', 'windowsAgent', 'managerWorkspace', 'remoteHybrid'],
+    privacy: false,
+    benefits: ['Automatic records instead of manual sign-ins', 'Consistent across remote, hybrid and in-office staff', 'Feeds directly into reporting'],
+    useCases: [
+      { title: 'Replacing Manual Timesheets', description: 'Move from self-reported hours to automatic records.' },
+      { title: 'Tracking Attendance for Distributed Teams', description: 'Keep consistent records regardless of location.' },
+    ],
+    faq: [
+      { question: 'How is attendance monitoring different from timesheets employees fill in manually?', answer: "Attendance monitoring in ZUZU is captured automatically through the Windows agent, not self-reported." },
+      { question: 'Does attendance monitoring require a company network?', answer: "No, ZUZU's time & attendance works regardless of network." },
+      { question: 'Is attendance monitoring the same as workday tracking?', answer: 'No, attendance monitoring records start and stop times. Workday tracking combines that attendance data with activity data into a single timeline of the day, so attendance is one of the two inputs, not the same thing.' },
+      { question: 'Does attendance monitoring capture GPS or physical location?', answer: 'No, ZUZU records device-based attendance through the Windows agent; it does not track GPS or physical location.' },
+      { question: "Can a manager see attendance for employees outside their own team?", answer: "No, the manager workspace is scoped to a manager's assigned team; org-wide attendance data is visible through the admin portal instead." },
+      { question: 'Does attendance monitoring work the same for a personal device used for work?', answer: "On a personal laptop, capture is consent-gated to the work session itself, it only runs between punch-in and punch-out, via a permission the agent must keep renewing, so it stops automatically once that session ends." },
+      { question: "What happens to attendance data if an employee's device is offline?", answer: "The Windows agent queues the data locally and sends it once the device reconnects, so an attendance record isn't lost to a connectivity gap." },
+      { question: 'Can attendance records be exported?', answer: 'Yes, attendance data feeds into reports exportable as CSV, Excel or PDF, and into weekly report emails and team daily digests.' },
+    ],
+    related: ['employee-activity-monitoring', 'workday-tracking', 'workforce-reporting'],
+    externalLinks: [{ title: 'Employee Attendance Tracking', description: "ZUZU's attendance capability in depth.", href: '/time-attendance/employee-attendance-tracking' }],
+  },
+  {
+    slug: 'workday-tracking',
+    title: 'What Is Workday Tracking?',
+    cluster: 'core',
+    visual: 'dashboard',
+    sectionOrder: ORDER_C,
+    metaDescription: "A plain-language explanation of what workday tracking is and how ZUZU combines attendance and activity data into one timeline.",
+    intro:
+      "Workday tracking combines attendance and activity data into a single timeline of someone's working day, when it started, when it ended, and what happened in between, rather than two separate records.",
+    howItWorksNote: 'Workday tracking is generally a synthesis of attendance and activity data; ZUZU builds this from the same time & attendance and employee activity data it already captures.',
+    features: ['timeAttendance', 'employeeActivity', 'aiReports', 'managerWorkspace'],
+    privacy: false,
+    benefits: ['A single timeline instead of separate records', 'No extra setup beyond existing attendance and activity data', 'Useful for reviewing a specific day'],
+    useCases: [
+      { title: 'Reviewing a Specific Day', description: "See a full day's shape in one place." },
+      { title: 'Understanding Workday Patterns', description: 'Compare how workdays vary across a week.' },
+    ],
+    faq: [
+      { question: 'Is workday tracking a separate feature from attendance and activity?', answer: "In ZUZU, no, it's built from the same underlying data." },
+      { question: 'Who typically uses workday tracking?', answer: 'Managers wanting a single view of a day rather than separate records.' },
+      { question: 'Is workday tracking a form of reporting, or its own data source?', answer: "It's a synthesis, not a new data source, ZUZU builds the workday timeline from the same time & attendance and employee activity data it already captures, rather than collecting anything separately." },
+      { question: 'How is workday tracking different from an AI workforce report?', answer: 'Workday tracking is the underlying timeline for a single day; an AI workforce report is a written, AI-generated summary that can be browsed by year, month or day, with PDF downloads.' },
+      { question: 'Does workday tracking show screenshots as part of the timeline?', answer: 'It can include screenshot context where screenshot monitoring is enabled for that employee, alongside the attendance and activity data that makes up the timeline.' },
+      { question: "Can an employee's workday timeline vary day to day?", answer: "Yes, since it's built from that day's actual attendance and activity data, the timeline reflects whatever was captured, including offline periods the agent queued and later synced." },
+      { question: 'Who typically reviews a workday timeline, a manager or an admin?', answer: "Usually a manager, through the manager workspace scoped to their own team; admins can also see it organization-wide through the admin portal." },
+      { question: 'Is workday tracking available for remote and hybrid employees the same way?', answer: "Yes, it's built from time & attendance and employee activity data, both of which work the same regardless of a device's location or network." },
+    ],
+    related: ['attendance-monitoring', 'employee-activity-monitoring', 'workforce-reporting'],
+    externalLinks: [{ title: 'Employee Workday Tracking', description: "ZUZU's workday tracking capability in depth.", href: '/time-attendance/employee-workday-tracking' }],
+  },
+  {
+    slug: 'workforce-analytics',
+    title: 'What Is Workforce Analytics?',
+    cluster: 'intelligence',
+    visual: 'dashboard',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: "A plain-language explanation of workforce analytics and how ZUZU's workforce analytics capability works.",
+    intro:
+      "Workforce analytics looks at activity, attendance and behaviour data over time to surface trends and patterns, the difference between a single day's snapshot and understanding how a team actually works over weeks or months.",
+    howItWorksNote: "Workforce analytics generally analyzes historical data for trends; ZUZU's workforce analytics does this using existing activity, attendance and behaviour data.",
+    features: ['workforceAnalytics', 'behaviourIntelligence', 'employeeActivity', 'aiReports'],
+    privacy: false,
+    benefits: ['Trends over time, not single-day snapshots', 'Built from data already captured', 'Useful for spotting patterns across teams or periods'],
+    useCases: [
+      { title: 'Spotting a Trend Across Weeks', description: 'Distinguish a real pattern from a one-off event.' },
+      { title: 'Comparing Teams or Periods', description: 'See how patterns vary.' },
+    ],
+    faq: [
+      { question: 'Is workforce analytics the same as a productivity score?', answer: "No, ZUZU's workforce analytics surfaces trends and patterns across the organization. ZUZU also includes a productivity score." },
+      { question: 'What data feeds workforce analytics?', answer: 'Activity, attendance and behaviour data already captured across ZUZU.' },
+      { question: 'How is workforce analytics different from AI workforce reports?', answer: "AI workforce reports summarize a day (or a browsable range) per employee; workforce analytics looks across the organization for trends, organization health, department benchmarking and burnout risk, rather than one person's daily report." },
+      { question: 'Does workforce analytics predict who is going to quit?', answer: 'No, ZUZU does not predict turnover or attrition. Its analytics forecast burnout risk from working-hour patterns, which is a different thing from predicting who will leave.' },
+      { question: 'What does "burnout risk" mean inside workforce analytics?', answer: "ZUZU's wellbeing & burnout forecast projects risk per employee from patterns like long days, weekend work and late-night activity, showing the drivers behind each forecast and a weeks-to-risk estimate when the trend is rising. It's framed as a forecast meant to prompt a conversation, not a performance measure." },
+      { question: 'Does workforce analytics rank or score employees against each other?', answer: "No, it surfaces trends, department benchmarking and recommendations tied to specific observations, not a ranking of employees." },
+      { question: 'Does workforce analytics require extra setup beyond what ZUZU already captures?', answer: "No, it's built from activity, attendance and behaviour data ZUZU already captures; there's no separate data source to configure." },
+      { question: 'Who can access organization-wide workforce analytics?', answer: "Admins, through the admin portal; managers see analytics scoped to their own team through the manager workspace." },
+    ],
+    related: ['ai-workforce-reports', 'workforce-reporting', 'employee-activity-monitoring'],
+    externalLinks: [{ title: 'Workforce Analytics Software', description: "ZUZU's analytics capability in depth.", href: '/platform/workforce-analytics-software' }],
+  },
+  {
+    slug: 'ai-workforce-reports',
+    title: 'What Are AI Workforce Reports?',
+    cluster: 'intelligence',
+    visual: 'dashboard',
+    sectionOrder: ORDER_B,
+    metaDescription: 'A plain-language explanation of what AI workforce reports are and how ZUZU generates them.',
+    intro:
+      'AI workforce reports use AI to summarize raw activity, attendance and other workforce data into a report a person can read in minutes, instead of manually compiling it.',
+    howItWorksNote: "Generally, AI reporting tools compress structured data into a summary; ZUZU's AI reports does this from activity, attendance and screenshot data already captured.",
+    features: ['aiReports', 'employeeActivity', 'timeAttendance', 'managerWorkspace'],
+    privacy: true,
+    benefits: ['A ready summary instead of raw data', 'Saves manual compilation time', 'Available at the individual or organization level'],
+    useCases: [
+      { title: 'Getting a Quick Summary Without Manual Review', description: 'Rely on an AI-generated report.' },
+      { title: 'Preparing for a Review', description: 'Use a report as a starting point for a conversation.' },
+    ],
+    faq: [
+      { question: 'Does AI reporting make decisions for managers?', answer: 'No, it summarizes data; interpreting it stays with the manager.' },
+      { question: 'What does an AI workforce report typically include?', answer: 'In ZUZU, activity, attendance and screenshot context, combined into one summary.' },
+      { question: 'How often is an AI workforce report generated?', answer: 'ZUZU generates one AI report per employee per day, browsable by year, month and day.' },
+      { question: 'Can an AI workforce report be downloaded or shared outside the platform?', answer: 'Yes, reports can be downloaded as PDFs, and are also distributed through organization-wide or manager-specific email digests.' },
+      { question: 'Is an AI workforce report the same as workforce analytics?', answer: "No, an AI report summarizes one employee's day; workforce analytics looks across the organization for trends like department benchmarking and burnout risk, over a longer time horizon." },
+      { question: 'Does the AI in these reports flag or predict anything on its own, like performance issues?', answer: 'The AI reports summarize captured activity, attendance and screenshot context; interpreting that summary, including any performance conversation, stays with the manager, not an automated judgment from the report itself.' },
+      { question: 'Can a manager only see AI reports for their own team?', answer: "Yes, through the manager workspace, a manager sees reports for their own assigned team; org-wide reports are available to admins through the admin portal." },
+      { question: 'Does generating an AI report require any extra setup from an employee?', answer: "No, reports are generated automatically from data the Windows agent already captures; there's nothing an employee needs to do to produce one." },
+    ],
+    related: ['workforce-analytics', 'workforce-reporting', 'screenshot-monitoring'],
+    externalLinks: [{ title: 'AI Employee Reports', description: "ZUZU's AI reporting capability in depth.", href: '/ai-analytics/ai-employee-reports' }],
+  },
+  {
+    slug: 'screenshot-monitoring',
+    title: 'What Is Employee Screenshot Monitoring?',
+    cluster: 'intelligence',
+    visual: 'dashboard',
+    sectionOrder: ORDER_C,
+    metaDescription: "A plain-language explanation of employee screenshot monitoring, screenshot intervals, and privacy protections like ZUZU's on-device redaction.",
+    intro:
+      "Employee screenshot monitoring captures periodic images of a screen, giving visual context alongside activity data. Done responsibly, it's paired with privacy protections rather than capturing everything indiscriminately.",
+    howItWorksNote: 'Screenshot monitoring tools generally capture images on an interval; ZUZU captures on a configurable interval and redacts sensitive regions on-device before storage or upload.',
+    features: ['screenshotMonitoring', 'privacyControls', 'employeeActivity', 'windowsAgent'],
+    privacy: true,
+    benefits: ['Visual context alongside activity data', 'Configurable capture interval', 'Sensitive regions redacted on-device before storage'],
+    useCases: [
+      { title: 'Confirming Context on an Activity Report', description: 'Use a screenshot to understand what was on screen.' },
+      { title: 'Evaluating Monitoring Approaches Responsibly', description: 'Understand what privacy protections to look for.' },
+    ],
+    faq: [
+      { question: 'Does screenshot monitoring capture continuously?', answer: 'In ZUZU, no, screenshots are captured on a configured interval, not continuously.' },
+      { question: 'How is sensitive information protected in screenshots?', answer: 'Through on-device private-region redaction before a screenshot is stored or uploaded.' },
+      { question: 'How often does ZUZU capture a screenshot?', answer: 'The interval is configurable, from 1 to 5 minutes or a custom value.' },
+      { question: 'What exactly gets redacted in a screenshot?', answer: 'Private regions such as passwords, banking, webmail, messaging apps, password managers and desktop notifications are redacted on-device before the screenshot is ever stored or uploaded.' },
+      { question: 'How long does ZUZU keep screenshots?', answer: 'The default is 90 days, and admins can configure retention through the admin portal.' },
+      { question: 'Is screenshot monitoring the same as employee activity monitoring?', answer: 'No, activity monitoring records application and website usage; screenshot monitoring captures periodic images for visual context. ZUZU uses both together, but they are separate capabilities.' },
+      { question: 'Does screenshot capture work differently for a personal device?', answer: 'Yes, on a personal laptop, capture is consent-gated and session-based, only running between punch-in and punch-out via a permission the agent must keep renewing.' },
+      { question: 'Can employees or managers see which regions get redacted before a screenshot is taken?', answer: "Private-region redaction (passwords, banking, webmail, messaging, password managers, notifications) happens automatically on-device; it isn't something a viewer configures per screenshot, though admins set overall screenshot policy through the admin portal." },
+    ],
+    related: ['employee-activity-monitoring', 'ai-workforce-reports', 'hybrid-workforce-management'],
+    externalLinks: [{ title: 'Screenshot Monitoring', description: "ZUZU's screenshot capability in depth.", href: '/screenshot-privacy/screenshot-monitoring' }],
+  },
+  {
+    slug: 'remote-workforce-monitoring',
+    title: 'What Is Remote Workforce Monitoring?',
+    cluster: 'distributed',
+    visual: 'photo',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: 'A plain-language explanation of remote workforce monitoring and how ZUZU supports distributed teams.',
+    intro:
+      "Remote workforce monitoring is how organizations maintain visibility into work when a team doesn't share a physical office, using activity, attendance and reporting data instead of in-person observation.",
+    howItWorksNote: "Remote monitoring tools generally work the same regardless of a device's location; ZUZU's Windows agent, activity and attendance capabilities apply the same way to any device.",
+    features: ['remoteHybrid', 'employeeActivity', 'timeAttendance', 'managerWorkspace'],
+    privacy: true,
+    benefits: ['The same visibility as an in-office team', 'No special configuration for remote devices', 'Works regardless of network'],
+    useCases: [
+      { title: 'Managing a Newly Remote Team', description: 'Replace informal in-person visibility with data-based visibility.' },
+      { title: 'Evaluating Remote Monitoring Options', description: 'Understand what to look for when comparing tools.' },
+    ],
+    faq: [
+      { question: 'Does remote workforce monitoring require a company network or VPN?', answer: "In ZUZU, no, the Windows agent works on any device it's installed on." },
+      { question: 'Does remote monitoring track physical location?', answer: 'ZUZU captures activity and attendance data; it does not track physical or GPS location.' },
+      { question: 'How is remote workforce monitoring different from hybrid workforce management?', answer: 'Remote monitoring covers a team that works off-site full time; hybrid workforce management covers teams that split time between office and remote days and need the same visibility to hold consistently across both.' },
+      { question: 'Does remote monitoring behave differently on a personal laptop versus a company device?', answer: "Yes, on a personal laptop, capture is consent-gated to the work session itself, only active between punch-in and punch-out via a renewable permission, rather than running continuously as it might on a company-owned device." },
+      { question: 'Can a manager monitor remote employees outside their own team?', answer: "No, the manager workspace only shows a manager their own assigned team, regardless of where those employees are located." },
+      { question: 'What happens to captured data if a remote device loses its internet connection?', answer: 'The Windows agent queues captures locally and syncs them once the device reconnects, so nothing depends on a constant connection.' },
+      { question: 'What kind of visibility does remote workforce monitoring actually provide?', answer: 'Activity, attendance, screenshot and reporting data through the same ZUZU capabilities used for in-office employees, not GPS or physical location tracking, which ZUZU does not do.' },
+      { question: 'Does remote monitoring cover non-Windows devices remote employees might use?', answer: 'No, the Windows agent only supports Windows; ZUZU does not offer a macOS or Linux agent.' },
+    ],
+    related: ['hybrid-workforce-management', 'employee-activity-monitoring', 'workforce-reporting'],
+    externalLinks: [{ title: 'Remote Work Visibility', description: "ZUZU's remote workforce capability in depth.", href: '/remote-workforce/remote-work-visibility' }],
+  },
+  {
+    slug: 'hybrid-workforce-management',
+    title: 'What Is Hybrid Workforce Management?',
+    cluster: 'distributed',
+    visual: 'photo',
+    sectionOrder: ORDER_B,
+    metaDescription: 'A plain-language explanation of hybrid workforce management and how ZUZU keeps visibility consistent across office and remote days.',
+    intro:
+      'Hybrid workforce management covers organizations where employees split time between office and remote work, the challenge being consistent visibility and policy regardless of where someone works on a given day.',
+    howItWorksNote: "Hybrid-capable tools apply the same monitoring regardless of location; ZUZU's Windows agent, time & attendance and reporting work identically on or off a company network.",
+    features: ['remoteHybrid', 'timeAttendance', 'employeeActivity', 'workforceVisibility'],
+    privacy: true,
+    benefits: ['Consistent data across office and remote days', 'No separate policy by location', 'One report format across a hybrid week'],
+    useCases: [
+      { title: "Reviewing a Hybrid Team's Full Week", description: 'See a consistent record spanning office and remote days.' },
+      { title: 'Comparing Office and Remote Patterns', description: 'Check whether patterns differ by day type.' },
+    ],
+    faq: [
+      { question: 'Does hybrid workforce management require different tools for office vs. remote days?', answer: 'In ZUZU, no, the same capabilities apply regardless of location.' },
+      { question: 'How does ZUZU know if someone is in the office or remote?', answer: "It doesn't specifically track that; it captures activity and attendance consistently regardless of location." },
+      { question: 'Is hybrid workforce management a separate ZUZU feature from remote workforce monitoring?', answer: 'No, both draw on the same underlying capabilities (Windows agent, time & attendance, employee activity); "hybrid" describes an organization\'s working pattern, not a distinct product feature.' },
+      { question: "Does a hybrid employee's screenshot or activity data look different on office vs. remote days?", answer: "The underlying capture works the same either way; any difference in what's captured simply reflects what the employee actually did that day, not a change in policy by location." },
+      { question: 'Does personal-device consent gating apply on remote days for a hybrid employee?', answer: 'Yes, if a hybrid employee uses a personal laptop on a remote day, capture is session-gated to between punch-in and punch-out on that device, the same as it would be for a fully remote employee.' },
+      { question: "Can a manager see a hybrid team's full week in one place?", answer: "Yes, the manager workspace shows a manager's own team's activity, attendance and reports in one consistent format spanning both office and remote days." },
+      { question: 'Does hybrid workforce management require different monitoring policies configured for office vs. remote work?', answer: 'No, monitoring policy is set once in the admin portal and applies consistently regardless of where an employee is working on a given day.' },
+      { question: 'Does the burnout forecast account for hybrid work patterns, like commuting days?', answer: "It forecasts from working-hour patterns, long days, weekend work and late-night activity, rather than from location, so it applies the same way to hybrid employees as to anyone else." },
+    ],
+    related: ['remote-workforce-monitoring', 'employee-activity-monitoring', 'workforce-analytics'],
+    externalLinks: [{ title: 'Hybrid Workforce Visibility', description: "ZUZU's hybrid workforce capability in depth.", href: '/remote-workforce/hybrid-workforce-visibility' }],
+  },
+  {
+    slug: 'workforce-reporting',
+    title: 'What Is Workforce Reporting?',
+    cluster: 'distributed',
+    visual: 'dashboard',
+    sectionOrder: ORDER_C,
+    metaDescription: 'A plain-language explanation of workforce reporting and how ZUZU generates reports automatically.',
+    intro:
+      'Workforce reporting turns ongoing activity and attendance data into a document a manager, admin or leadership can actually review, instead of raw logs that need manual compilation.',
+    howItWorksNote: "Workforce reporting tools generally generate reports from existing data automatically; ZUZU's reports draw on activity, attendance and AI-generated summaries, exportable to CSV, Excel or PDF.",
+    features: ['aiReports', 'timeAttendance', 'employeeActivity', 'adminPortal'],
+    privacy: false,
+    benefits: ['A ready report instead of manual compilation', 'Consistent across employee, team and organization levels', 'Exportable to CSV, Excel or PDF'],
+    useCases: [
+      { title: 'Monthly Workforce Reporting', description: 'Generate a report without manual work.' },
+      { title: 'Sharing a Report Outside the Platform', description: 'Export a report to share with stakeholders.' },
+    ],
+    faq: [
+      { question: 'What export formats does workforce reporting typically support?', answer: 'In ZUZU: CSV, Excel and PDF.' },
+      { question: 'Is workforce reporting automated or manual?', answer: 'In ZUZU, reports are generated automatically from ongoing activity and attendance data.' },
+      { question: 'How is workforce reporting different from an AI workforce report?', answer: 'An AI workforce report is a specific output, one AI-generated summary per employee per day. Workforce reporting is the broader capability, covering employee, team and organization-level reports generated from activity and attendance data, exportable to CSV, Excel or PDF.' },
+      { question: 'Does workforce reporting include email digests, or only exports?', answer: 'Both, ZUZU supports weekly report emails, team daily digests, and organization-wide or manager-specific email digests, alongside on-demand CSV, Excel and PDF exports.' },
+      { question: "Can an admin see reports for the whole organization, not just one team?", answer: "Yes, organization-wide reports and exports are available through the admin portal; a manager's view through the manager workspace is scoped to their own team." },
+      { question: 'What data feeds into workforce reporting?', answer: "Activity, attendance and AI-generated summaries already captured by the Windows agent, reporting doesn't require a separate data source." },
+      { question: 'Is workforce reporting the same thing as workforce analytics?', answer: 'No, reporting turns data into a reviewable document (a report or export); workforce analytics goes further, surfacing trends, benchmarking and burnout risk across that same underlying data.' },
+      { question: 'Does generating a report require manual compilation by an admin or manager?', answer: 'No, reports are generated automatically from ongoing activity and attendance data; a person downloads, exports or reviews the result rather than assembling it.' },
+    ],
+    related: ['ai-workforce-reports', 'workforce-analytics', 'workday-tracking'],
+    externalLinks: [{ title: 'Reports + Exports Ecosystem', description: "ZUZU's full reporting and export ecosystem.", href: '/reports' }],
+  },
+  {
+    slug: 'windows-agent',
+    title: 'What Is a Windows Agent?',
+    cluster: 'platform',
+    visual: 'dashboard',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: "A plain-language explanation of what a Windows agent is and how ZUZU's Windows agent works.",
+    intro:
+      "A Windows agent, in workforce visibility software, is the small program installed on an employee's Windows device that actually captures the underlying data, activity, attendance and screenshots where enabled, rather than the concept being enforced from outside the device.",
+    howItWorksNote: "A Windows agent generally runs quietly on a device, visible via the system tray; ZUZU's Windows agent does this, capturing data and queuing it locally if offline.",
+    features: ['windowsAgent', 'employeeActivity', 'timeAttendance', 'privacyControls'],
+    privacy: true,
+    benefits: ['Runs directly on the device being monitored', 'Visible via the system tray, not hidden', 'Works offline, queuing data until reconnected'],
+    useCases: [
+      { title: "Understanding What's Actually Installed", description: 'Know what the Windows agent is before deploying it.' },
+      { title: 'Evaluating Monitoring Software Options', description: 'Compare how different tools capture data at the device level.' },
+    ],
+    faq: [
+      { question: 'Is a Windows agent the same as an antivirus or security tool?', answer: "No, a workforce visibility Windows agent like ZUZU's captures activity, attendance and screenshot data, not security threats." },
+      { question: "How large is ZUZU's Windows Agent installer?", answer: 'Approximately 80 MB.' },
+      { question: 'Does ZUZU have an agent for Mac or Linux?', answer: 'No, ZUZU\'s agent is Windows-only; there is no macOS or Linux agent.' },
+      { question: 'How do you install the Windows Agent?', answer: 'Download the installer, run it, complete setup, and enter a 16-character activation code, after that, the agent runs from the system tray.' },
+      { question: 'What happens if the device running the Windows Agent loses internet connectivity?', answer: "The agent queues captures locally while offline and sends them once the device reconnects, so data isn't lost to a temporary outage." },
+      { question: 'Does the Windows Agent need to be manually updated by an admin?', answer: "No, it receives updates automatically from the organization's release feed." },
+      { question: 'Is the Windows Agent hidden from the employee using the device?', answer: 'No, it runs visibly from the system tray rather than being hidden.' },
+      { question: 'Does the Windows Agent capture screenshots automatically, or is that separate?', answer: "Screenshot capture is enabled and configured separately (interval, retention), but it's captured by the same Windows agent alongside activity and attendance data, it isn't a different piece of software." },
+    ],
+    related: ['employee-monitoring-software', 'employee-activity-monitoring', 'how-zuzu-works'],
+    externalLinks: [{ title: 'ZUZU Windows Agent', description: "ZUZU's Windows agent in depth.", href: '/windows-agent' }],
+  },
+  {
+    slug: 'employee-monitoring-software',
+    title: 'What Is Employee Monitoring Software?',
+    cluster: 'platform',
+    visual: 'dashboard',
+    sectionOrder: ORDER_B,
+    metaDescription: 'A plain-language explanation of employee monitoring software as a category, and where ZUZU fits.',
+    intro:
+      'Employee monitoring software is the general category of tools that give organizations visibility into how employees work, usually some combination of activity tracking, attendance recording and reporting, installed on company devices.',
+    howItWorksNote: 'Employee monitoring software generally combines an on-device agent with a management dashboard; ZUZU does this through the Windows agent, manager workspace and admin portal.',
+    features: ['employeeActivity', 'timeAttendance', 'managerWorkspace', 'adminPortal'],
+    privacy: true,
+    benefits: ['Combines activity, attendance and reporting in one category', 'Distinct from narrower tools that only do one of these', 'Should be evaluated on privacy protections, not just capability'],
+    useCases: [
+      { title: 'Researching the Category Before Evaluating Tools', description: 'Understand what employee monitoring software generally includes.' },
+      { title: 'Comparing Scope Across Tools', description: 'Check whether a tool covers activity, attendance, or both.' },
+    ],
+    faq: [
+      { question: 'Is employee monitoring software the same for every vendor?', answer: 'No, scope and privacy protections vary; always check a specific vendor\'s documentation.' },
+      { question: 'What does ZUZU specifically include?', answer: 'Employee activity, time & attendance, screenshot monitoring, AI reports, workforce analytics, manager workspace and admin portal.' },
+      { question: 'Is employee monitoring software the same as a Windows agent?', answer: "No, a Windows agent (like ZUZU's) is the on-device component that actually captures data; \"employee monitoring software\" is the broader category, including the agent plus dashboards like the manager workspace and admin portal." },
+      { question: 'Does employee monitoring software always include screenshots?', answer: 'Not necessarily, it varies by vendor. ZUZU includes screenshot monitoring as one capability alongside employee activity, time & attendance, AI reports and workforce analytics, but scope differs across tools in this category.' },
+      { question: 'Does employee monitoring software require installing something on every device?', answer: "Generally yes, it needs an on-device agent to capture data, which is what ZUZU's Windows agent does; without an agent installed, there's nothing to monitor." },
+      { question: 'Is employee monitoring software the same thing as workforce management software?', answer: "No, workforce management software is the broader category covering how an organization organizes, schedules and administers its workforce; employee monitoring software specifically covers activity, attendance and reporting visibility, which is one part of that." },
+      { question: 'Does employee monitoring software process payroll?', answer: "Not in ZUZU's case, ZUZU does not process payroll or integrate with payroll or accounting systems." },
+      { question: 'What should someone check before choosing employee monitoring software?', answer: "What it actually captures, what privacy protections exist (like configurable retention and on-device redaction), and whether access is role-scoped, for example, whether managers can only see their own team's data." },
+    ],
+    related: ['windows-agent', 'workforce-management-software', 'how-zuzu-works'],
+    externalLinks: [{ title: 'ZUZU Platform Overview', description: "Explore ZUZU's full platform.", href: '/platform' }],
+  },
+  {
+    slug: 'workforce-management-software',
+    title: 'What Is Workforce Management Software?',
+    cluster: 'platform',
+    visual: 'dashboard',
+    sectionOrder: ORDER_C,
+    metaDescription: "A plain-language explanation of workforce management software and how ZUZU's admin portal fits the category.",
+    intro:
+      'Workforce management software is the broader category covering how an organization organizes, schedules and oversees its workforce, attendance and activity visibility being one part of that, alongside administration and reporting.',
+    howItWorksNote: 'Workforce management software generally centralizes employee organization and policy; ZUZU does this through the admin portal, alongside activity and attendance capture.',
+    features: ['adminPortal', 'timeAttendance', 'managerWorkspace', 'workforceAnalytics'],
+    privacy: false,
+    benefits: ['Centralizes employee and team organization', 'Combines administration with activity and attendance data', 'Scales from small teams to large organizations'],
+    useCases: [
+      { title: 'Centralizing Employee Administration', description: 'Organize employees, teams and policy in one place.' },
+      { title: 'Comparing Workforce Management Tools', description: 'Understand what the category generally includes.' },
+    ],
+    faq: [
+      { question: 'Is workforce management software just about scheduling?', answer: "Scheduling is one possible feature; ZUZU's focus is activity, attendance, reporting and administration rather than shift scheduling." },
+      { question: 'How does ZUZU handle workforce management?', answer: 'Through the admin portal, alongside time & attendance and workforce analytics.' },
+      { question: 'Does workforce management software include payroll?', answer: "Not in ZUZU's case, ZUZU does not process payroll or integrate with payroll or accounting systems; its admin portal covers employees, teams, managers, monitoring policy, reports, security and org settings instead." },
+      { question: 'Is workforce management software the same as an admin portal?', answer: "An admin portal is the interface for it, ZUZU's admin portal is where the workforce management functions (employees, teams, managers, policy, security, audit activity) are actually configured." },
+      { question: 'What security controls does workforce management software in ZUZU offer?', answer: 'Capability-based access, two-factor authentication, configurable screenshot retention and audit trails with severity filtering, a timeline view and export, all managed through the admin portal.' },
+      { question: 'How does workforce management software relate to workforce analytics?', answer: "Analytics is one layer on top, ZUZU's workforce analytics (organization health, benchmarking, burnout risk) is built from the same data the admin portal already manages, rather than a separate system." },
+      { question: 'Who typically has access to workforce management software, every employee, or just certain roles?', answer: 'Access is role-scoped: the admin portal is for admins managing the organization; managers get a narrower manager workspace limited to their own team.' },
+      { question: 'Does workforce management software require a minimum team size to be useful?', answer: "No, ZUZU's trial supports up to 10 employees, and the platform scales from small teams to larger organizations from there." },
+    ],
+    related: ['employee-monitoring-software', 'manager-workspace', 'admin-portal'],
+    externalLinks: [{ title: 'Admin Dashboard', description: "ZUZU's admin portal in depth.", href: '/admin/dashboard' }],
+  },
+  {
+    slug: 'manager-workspace',
+    title: 'What Is a Manager Workspace?',
+    cluster: 'people',
+    visual: 'dashboard',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: "A plain-language explanation of what a manager workspace is and how ZUZU's manager workspace works.",
+    intro:
+      "A manager workspace is a single place where a manager reviews their team, activity, attendance, reports and insights, without switching between separate tools or waiting on status updates from each person.",
+    howItWorksNote: "A manager workspace generally scopes data to a manager's own team; ZUZU's manager workspace does this, combining activity, attendance, reports and behaviour insights.",
+    features: ['managerWorkspace', 'employeeActivity', 'timeAttendance', 'behaviourIntelligence'],
+    privacy: false,
+    benefits: ["Everything scoped to a manager's own team, in one place", 'No switching between separate tools', 'Combines data with interpreted insights'],
+    useCases: [
+      { title: 'Reviewing a Team Without Separate Tools', description: 'Get everything in one workspace instead of several.' },
+      { title: "Understanding What a Manager Can and Can't See", description: 'Know that workspace access is scoped to their own team.' },
+    ],
+    faq: [
+      { question: 'Can a manager see data for teams other than their own?', answer: "In ZUZU, no, the manager workspace is scoped to a manager's assigned team." },
+      { question: "What does ZUZU's Manager Workspace include?", answer: "Activity, attendance, reports and behaviour insights for a manager's own team." },
+      { question: 'How is the Manager Workspace different from the Admin Portal?', answer: "The manager workspace is scoped to a manager's own assigned team; the admin portal is organization-wide, covering employees, teams, managers, policy, security and settings across the whole company." },
+      { question: 'Can a manager configure monitoring settings, like screenshot intervals or retention?', answer: 'No, those org-wide monitoring policies are configured in the admin portal by an admin; the manager workspace is for reviewing a manager\'s own team, not setting policy.' },
+      { question: 'Does the Manager Workspace include the burnout forecast?', answer: "Yes, behaviour and wellbeing insights, including burnout risk drivers and weeks-to-risk estimates, are part of what a manager can see for their own team, alongside activity, attendance and reports." },
+      { question: "What happens if an employee moves to a different manager's team?", answer: 'Manager workspace access is scoped to current team assignment, which is managed centrally through the admin portal, so visibility follows the assignment set there.' },
+      { question: 'Does the Manager Workspace show screenshots directly, or just summaries?', answer: "It can surface screenshot context alongside activity and attendance data and AI report summaries for the manager's own team." },
+      { question: 'Is the Manager Workspace available to every employee, or just people managers?', answer: "It's for people managers reviewing their assigned team; individual employees don't get a separate workspace of this kind." },
+    ],
+    related: ['admin-portal', 'behaviour-intelligence', 'employee-monitoring-software'],
+    externalLinks: [{ title: 'Manager Insight Workflow', description: "ZUZU's manager workspace in depth.", href: '/manager/manager-insight-workflow' }],
+  },
+  {
+    slug: 'admin-portal',
+    title: 'What Is an Admin Portal?',
+    cluster: 'people',
+    visual: 'dashboard',
+    sectionOrder: ORDER_B,
+    metaDescription: "A plain-language explanation of what an admin portal is and how ZUZU's admin portal works.",
+    intro:
+      'An admin portal is where an organization configures a piece of software at the organization-wide level, settings, employees, teams and policy, separate from the day-to-day, team-scoped view a manager uses.',
+    howItWorksNote: "An admin portal generally sits above manager-level tools, covering organization-wide configuration; ZUZU's admin portal does this for employees, teams, monitoring settings and policy.",
+    features: ['adminPortal', 'managerWorkspace', 'privacyControls', 'timeAttendance'],
+    privacy: true,
+    benefits: ['Organization-wide configuration, separate from team-level tools', 'One place for employees, teams and policy', 'Sets the baseline that team-level tools inherit'],
+    useCases: [
+      { title: 'Understanding Admin vs. Manager Access', description: 'Know the difference between organization-wide and team-scoped tools.' },
+      { title: 'Planning Organization-Wide Rollout', description: 'See what needs configuring centrally before adding teams.' },
+    ],
+    faq: [
+      { question: 'Who typically uses an admin portal?', answer: 'Admins responsible for organization-wide configuration, as opposed to managers who use a team-scoped workspace.' },
+      { question: "What does ZUZU's Admin Portal cover?", answer: 'Employees, teams, monitoring settings and policy for the whole organization.' },
+      { question: 'How is the Admin Portal different from the Manager Workspace?', answer: 'The admin portal is organization-wide, employees, teams, managers, monitoring policy, reports, security, audit activity, API keys and org settings; the manager workspace is scoped to just one manager\'s own team.' },
+      { question: 'What security features live in the Admin Portal?', answer: 'Capability-based access control, two-factor authentication, audit trails with severity filtering and a timeline view, and a dedicated API key logs feature for tracking API key activity.' },
+      { question: 'Can the Admin Portal configure screenshot retention and capture intervals?', answer: 'Yes, admins set screenshot retention (90 days by default, configurable) and capture interval settings for the organization through the admin portal.' },
+      { question: 'Does the Admin Portal handle payroll or billing?', answer: "No, ZUZU does not process payroll or integrate with payroll or accounting systems. Pricing is confirmed by employee headcount at checkout, separate from the admin portal's monitoring and organization settings." },
+      { question: 'What can an admin audit through the Admin Portal?', answer: 'Categories including employee, team, manager, shift, leave, report, payment, live-capture and organisation events, with severity filtering, a timeline view, and export.' },
+      { question: 'Does every employee need admin access to use ZUZU?', answer: "No, only admins configuring the organization need admin portal access; managers use the narrower manager workspace, and employees don't need portal access at all." },
+    ],
+    related: ['manager-workspace', 'workforce-management-software', 'privacy-aware-monitoring'],
+    externalLinks: [{ title: 'Admin Dashboard', description: "ZUZU's admin portal in depth.", href: '/admin/dashboard' }],
+  },
+  {
+    slug: 'behaviour-intelligence',
+    title: 'What Is Behaviour Intelligence?',
+    cluster: 'people',
+    visual: 'dashboard',
+    sectionOrder: ORDER_C,
+    metaDescription: "A plain-language explanation of behaviour intelligence and how ZUZU's behaviour intelligence capability works, without psychological profiling.",
+    intro:
+      "Behaviour intelligence, in workforce software, compares someone's ongoing work pattern to their own typical baseline and surfaces meaningful changes, not a psychological assessment, but a data comparison over time.",
+    howItWorksNote: "Behaviour intelligence tools generally compare ongoing data to a baseline; ZUZU's behaviour intelligence does this using activity and attendance data already captured.",
+    features: ['behaviourIntelligence', 'employeeActivity', 'timeAttendance', 'aiReports'],
+    privacy: true,
+    benefits: ['Compares someone to their own baseline, not a fixed standard', 'Surfaces changes for review, not conclusions', 'Built from data already captured, not a separate system'],
+    useCases: [
+      { title: 'Understanding What Behaviour Intelligence Actually Measures', description: "Know it's work-pattern data, not psychological analysis." },
+      { title: 'Evaluating Responsible Monitoring Tools', description: 'Check whether a tool frames changes as review prompts, not judgments.' },
+    ],
+    faq: [
+      { question: 'Does behaviour intelligence involve psychological profiling?', answer: "No, ZUZU's behaviour intelligence compares work-pattern data like activity and attendance, not personal or psychological characteristics." },
+      { question: 'Does a flagged change mean something is wrong?', answer: "No, it's surfaced for a manager to review in context, not a conclusion." },
+      { question: 'Does behaviour intelligence predict who is going to quit?', answer: "No, it only surfaces activity-pattern changes against someone's own baseline as a conversation prompt; it does not predict turnover or attrition." },
+      { question: 'How is behaviour intelligence different from the burnout forecast in workforce analytics?', answer: "Behaviour intelligence flags changes from an individual's own activity baseline for review; the burnout forecast specifically projects wellbeing risk from working-hour patterns like long days, weekend and late-night work, with drivers and a weeks-to-risk estimate. They're related but distinct, one is pattern-change detection, the other a wellbeing-specific forecast." },
+      { question: 'Does behaviour intelligence compare an employee to generic job-title rules?', answer: 'No, it compares someone to their own historical baseline, not to a fixed rule based on their role or title.' },
+      { question: 'What happens when behaviour intelligence flags a change?', answer: "It routes to a review queue for a manager to look at in context, it's a prompt for a conversation, not an automated conclusion or disciplinary trigger." },
+      { question: 'Can behaviour intelligence diagnose burnout or mental health conditions?', answer: "No, ZUZU doesn't diagnose burnout or any condition clinically; the related burnout forecast projects risk from working-hour patterns as something to prompt a conversation, not a clinical assessment." },
+      { question: "Who can see a flagged behaviour intelligence item, just the employee's manager, or anyone?", answer: "It routes to the relevant manager's review queue through the manager workspace, scoped to that manager's own team; admins can see it organization-wide through the admin portal." },
+    ],
+    related: ['manager-workspace', 'privacy-aware-monitoring', 'workforce-visibility'],
+    externalLinks: [{ title: 'Behaviour Intelligence', description: "ZUZU's behaviour intelligence in depth.", href: '/manager/behaviour-intelligence' }],
+  },
+  {
+    slug: 'workforce-visibility',
+    title: 'What Is Workforce Visibility?',
+    cluster: 'people',
+    visual: 'photo',
+    sectionOrder: ORDER_DEFAULT,
+    metaDescription: 'A plain-language explanation of workforce visibility and how ZUZU provides it through activity, attendance and reporting.',
+    intro:
+      'Workforce visibility is the general goal behind most of this category of software: understanding how a team is actually working, without relying on informal cues like seeing someone at their desk.',
+    howItWorksNote: "Workforce visibility generally comes from combining activity, attendance and reporting data; ZUZU builds this from the Windows agent, manager workspace and reports together.",
+    features: ['workforceVisibility', 'employeeActivity', 'timeAttendance', 'managerWorkspace'],
+    privacy: false,
+    benefits: ['Data-based visibility, not reliant on physical presence', 'Works the same for remote, hybrid and in-office teams', 'The underlying goal most other ZUZU capabilities support'],
+    useCases: [
+      { title: 'Replacing Informal, In-Person Visibility', description: "Get visibility that doesn't depend on seeing someone in person." },
+      { title: 'Establishing Visibility for a New or Growing Team', description: 'Set up consistent visibility from the start.' },
+    ],
+    faq: [
+      { question: 'Is workforce visibility a single feature?', answer: 'In ZUZU, it\'s the combined result of activity, attendance, reports and analytics, not one isolated feature.' },
+      { question: 'Does workforce visibility work the same for remote teams?', answer: 'Yes, the same underlying data and capabilities apply regardless of location.' },
+      { question: 'Is workforce visibility the same as workforce analytics?', answer: 'No, visibility is the underlying goal of understanding how work actually happens; workforce analytics is one capability that supports it, alongside activity, attendance, reports and behaviour intelligence.' },
+      { question: 'Does workforce visibility mean tracking physical location?', answer: 'No, ZUZU builds visibility from activity, attendance and reporting data; it does not track GPS or physical location.' },
+      { question: 'Does workforce visibility look the same for a manager and an admin?', answer: "No, a manager's visibility through the manager workspace is scoped to their own team; an admin's visibility through the admin portal is organization-wide." },
+      { question: 'How is workforce visibility different from behaviour intelligence?', answer: "Visibility is the broad, ongoing picture of how work is happening; behaviour intelligence is a narrower capability that compares someone's pattern to their own baseline and flags meaningful changes within that broader picture." },
+      { question: 'Does achieving workforce visibility require employees to self-report anything?', answer: 'No, it\'s built from data the Windows agent already captures automatically, not from manual updates or self-reported status.' },
+      { question: 'Is workforce visibility only useful for remote teams?', answer: 'No, the same underlying data and capabilities apply to remote, hybrid and in-office teams alike; it replaces informal in-person cues regardless of where people work.' },
+    ],
+    related: ['manager-workspace', 'behaviour-intelligence', 'remote-workforce-monitoring'],
+    externalLinks: [{ title: 'Remote Work Visibility', description: 'How workforce visibility applies to distributed teams.', href: '/remote-workforce/remote-work-visibility' }],
+  },
+  {
+    slug: 'privacy-aware-monitoring',
+    title: 'What Is Privacy-Aware Monitoring?',
+    cluster: 'people',
+    visual: 'dashboard',
+    sectionOrder: ORDER_B,
+    metaDescription: "A plain-language explanation of privacy-aware monitoring and how ZUZU builds it in through privacy controls and on-device redaction.",
+    intro:
+      'Privacy-aware monitoring is workforce monitoring built with employee privacy as a design consideration, not an afterthought, configurable boundaries and protections for sensitive information, rather than capturing everything by default.',
+    howItWorksNote: 'Privacy-aware monitoring generally means configurable boundaries plus protection for sensitive content; ZUZU does this through privacy controls and on-device private-region redaction.',
+    features: ['privacyControls', 'screenshotMonitoring', 'adminPortal', 'managerWorkspace'],
+    privacy: true,
+    benefits: ['Configurable monitoring boundaries, not one-size-fits-all', 'Sensitive regions protected automatically', 'Visibility and privacy addressed together, not traded off'],
+    useCases: [
+      { title: 'Evaluating Monitoring Tools Responsibly', description: 'Check for configurable privacy protections before choosing a tool.' },
+      { title: 'Explaining Monitoring Policy to a Team', description: 'Point to concrete privacy protections, not just a policy document.' },
+    ],
+    faq: [
+      { question: 'Is privacy-aware monitoring the same as no monitoring?', answer: 'No, it means monitoring with configurable boundaries and protections, not the absence of monitoring.' },
+      { question: 'How does ZUZU implement this?', answer: 'Through privacy controls and on-device private-region redaction, applied before a screenshot is stored or uploaded.' },
+      { question: 'What\'s a concrete example of privacy-aware monitoring in ZUZU, beyond just having a policy?', answer: 'On-device redaction of private regions, passwords, banking, webmail, messaging, password managers and desktop notifications, before a screenshot is ever stored or uploaded, plus configurable screenshot retention set by admins.' },
+      { question: 'How does privacy-aware monitoring handle personal devices differently from company devices?', answer: 'On a personal laptop, capture is consent-gated and session-based: it\'s only active between punch-in and punch-out, through a short-lived permission the agent must keep renewing, so it expires automatically outside a work session.' },
+      { question: "Does ZUZU decide what's legally required for consent, or does the organization?", answer: "The organization, ZUZU doesn't prescribe legal or consent policy; that responsibility sits with the organization, while ZUZU provides mechanisms like session-gated capture and configurable controls to support it." },
+      { question: 'Who controls privacy settings like screenshot retention, a manager or an admin?', answer: "An admin, through the admin portal; managers don't set organization-wide privacy policy, they work within whatever an admin has configured." },
+      { question: 'Does privacy-aware monitoring mean less data is captured overall?', answer: 'Not necessarily less, it means sensitive content is protected through on-device redaction and boundaries are configurable, rather than fewer capabilities existing.' },
+      { question: 'Is two-factor authentication part of privacy-aware monitoring?', answer: 'It\'s part of the same security posture, ZUZU supports two-factor authentication (MFA/OTP-based) alongside capability-based access control and audit trails, which protect who can view captured data even after it\'s collected.' },
+    ],
+    related: ['admin-portal', 'behaviour-intelligence', 'workforce-visibility'],
+    externalLinks: [{ title: 'Privacy-Aware Employee Monitoring', description: "ZUZU's approach in depth.", href: '/screenshot-privacy/privacy-aware-monitoring' }],
+  },
+]
+
+export const learningCluster = {
+  key: 'learning',
+  basePath: '/learning',
+  badgeLabel: 'Learning Center',
+  hubTitle: 'ZUZU Learning Center',
+  hubDescription:
+    'Plain-language explanations of the concepts behind workforce visibility, what they mean generally, and how ZUZU implements them.',
+  hubMetaDescription:
+    'The ZUZU learning center: what employee activity monitoring, attendance monitoring, workforce analytics, AI reports, screenshot monitoring, remote and hybrid workforce management, and workforce reporting actually mean.',
+  groups: LEARNING_GROUPS,
+  pages: LEARNING_PAGES,
+  // The hub page had no FAQ section. Reused verbatim from this cluster's own
+  // 'how-zuzu-works' page (same array reference, not a copy) rather than writing new
+  // questions -- already-verified, on-topic content for this cluster.
+  faq: LEARNING_PAGES.find((page) => page.slug === 'how-zuzu-works').faq,
+  crossLinks: [
+    { label: 'ZUZU Platform Overview', href: '/platform' },
+    { label: 'Knowledge Base', href: '/knowledge-base' },
+    { label: 'Use Cases', href: '/use-cases' },
+  ],
+}
